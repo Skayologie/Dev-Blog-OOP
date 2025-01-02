@@ -1,0 +1,9 @@
+node_modules
+handlers
+vendor
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
+index.php
+.idea
