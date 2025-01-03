@@ -1,6 +1,6 @@
 <?php
 namespace App\Modules;
-use connection;
+use App\config\Database;
 
 require realpath(__DIR__ . "/../../vendor/autoload.php");
 
@@ -13,7 +13,7 @@ class User{
     protected $status ;
 
     public function login(){
-        $conn = connection::connections();
+        $conn = Database::getConnection();
         $email = $_POST["email"];
         $password = $_POST["password"];
         if (!empty($email) && !empty($password)){
@@ -34,6 +34,7 @@ class User{
     public function updateProfile($id){
         
     }
+
 }
 
 

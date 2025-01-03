@@ -4,11 +4,11 @@ use App\Controller\operationsController;
 use App\Controller\usersController;
 
 require __DIR__."/../../../vendor/autoload.php";
-$resUser = usersController::GetUsers();
+$resArchived = usersController::GetArchivedUsers();
 
 if (isset($_GET["id"]) && isset($_GET["op"])){
     operationsController::operation($_GET["id"],$_GET["op"],"users","id");
-    header("refresh: 0; url = http://localhost:63342/Dev%20Blog%20S3/App/views/Admin/TableUsers.php");
+    header("refresh: 0; url = http://localhost:63342/Dev%20Blog%20S3/App/views/Admin/ArchivedUsers.php");
     exit;
 }
 ?>
@@ -28,8 +28,8 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
     <!-- Custom fonts for this template -->
     <link href="../../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
-            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-            rel="stylesheet">
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="../../../public/css/sb-admin-2.min.css" rel="stylesheet">
@@ -87,7 +87,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                 </div>
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Articles</h6>
-                        <a class="collapse-item" href="./Articles.php">Articles</a>
+                    <a class="collapse-item" href="./Articles.php">Articles</a>
                 </div>
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Tags</h6>
@@ -129,7 +129,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
 
                 <!-- Topbar Search -->
                 <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
                         <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
                                aria-label="Search" aria-describedby="basic-addon2">
@@ -335,9 +335,9 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
                             Users
                         </h6>
-                        <a href="ArchivedUsers.php">
+                        <a href="TableUsers.php">
                             <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Archived Users
+                                Normal Users
                             </h6>
                         </a>
                     </div>
@@ -363,16 +363,15 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                 </tr>
                                 </tfoot>
                                 <tbody>
-                                <?php foreach ($resUser as $row):?>
+                                <?php foreach ($resArchived as $row):?>
                                     <tr>
                                         <td><?= $row['id']?></td>
                                         <td><?= $row['username']?></td>
                                         <td><?= $row['email']?></td>
                                         <td><?= $row['bio']?></td>
                                         <td>
-                                            <a href="TableUsers.php?id=<?= $row['id']?>&op=archive"><button type="button" class="btn btn-warning">Archive</button></a>
-                                            <a href="Edit.php?id=<?= $row['id']?>&op=edit"><button type="button" class="btn btn-info">Edit</button></a>
-
+                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
+                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
                                         </td>
                                     </tr>
                                 <?php endforeach;?>

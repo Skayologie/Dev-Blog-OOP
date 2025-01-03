@@ -17,8 +17,9 @@ class CRUD
             echo "Insertion failed.";
         }
     }
-    public static function Get($conn,$table,$option=0){
-        $sql = "SELECT * FROM $table WHERE isArchived = $option";
+
+    public static function Get($conn,$table,$optionArchive,$optionDelete){
+        $sql = "SELECT * FROM $table WHERE isArchived = $optionArchive AND isDeleted = $optionDelete";
         $stmt = $conn->prepare($sql);
         if ($stmt->execute()) {
             return $stmt->fetchAll();
@@ -28,6 +29,38 @@ class CRUD
 
     }
 
+    public static function GetById($table,$colID,$id){
+        $conn = Database::getConnection();
+        $sql = "SELECT * FROM $table WHERE $colID = $id";
+        $stmt = $conn->prepare($sql);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll();
+        } else {
+            return false;
+        }
+
+    }
+
+
+    public static function Delete($id,$table,$col){
+        $conn = Database::getConnection();
+        $sql = "UPDATE $table SET isDeleted = 1 WHERE $col = $id";
+        if ($conn->exec($sql)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static function Edit($id,$table,$col){
+        $conn = Database::getConnection();
+        $sql = "UPDATE $table SET isDeleted = 1 WHERE $col = $id";
+        if ($conn->exec($sql)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
 
 

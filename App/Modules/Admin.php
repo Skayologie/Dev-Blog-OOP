@@ -2,6 +2,8 @@
 namespace App\Modules;
 
 
+use App\Config\Database;
+
 require realpath(__DIR__ . "/../../vendor/autoload.php");
 
 class Admin extends User{
@@ -20,4 +22,25 @@ class Admin extends User{
     public function View_Statistics(){
         
     }
+    public static function archive($id,$table,$col){
+        $conn = Database::getConnection();
+        $sql = "UPDATE $table SET isArchived = 1 WHERE $col = $id";
+
+        if ($conn->exec($sql)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public static function restore($id,$table,$col){
+        $conn = Database::getConnection();
+        $sql = "UPDATE $table SET isArchived = 0  WHERE $col = $id";
+        if ($conn->exec($sql)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
 }
