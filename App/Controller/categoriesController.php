@@ -8,7 +8,7 @@ class categoriesController
 {
     public static function GetCategories(){
         $conn = Database::getConnection();
-        $results = CRUD::Get($conn , "categories");
+        $results = CRUD::Get($conn , "categories",0,0);
         return $results;
     }
 }

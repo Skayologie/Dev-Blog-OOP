@@ -17,7 +17,7 @@ class articleController{
     public static function GetArticles()
     {
         $db = Database::getConnection();
-        $Results = CRUD::Get($db,'articles');
+        $Results = CRUD::Get($db,'articles',0,0);
         return $Results;
     }
 }

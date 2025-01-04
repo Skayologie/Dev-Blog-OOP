@@ -7,9 +7,7 @@ require __DIR__."/../../../vendor/autoload.php";
 $resArchived = usersController::GetArchivedUsers();
 
 if (isset($_GET["id"]) && isset($_GET["op"])){
-    operationsController::operation($_GET["id"],$_GET["op"],"users","id");
-    header("refresh: 0; url = http://localhost:63342/Dev%20Blog%20S3/App/views/Admin/ArchivedUsers.php");
-    exit;
+    operationsController::operation($_GET["id"],$_GET["op"],"users","id","ArchivedUsers.php");
 }
 ?>
 <!DOCTYPE html>

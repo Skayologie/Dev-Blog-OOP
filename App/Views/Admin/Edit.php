@@ -10,6 +10,25 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
     $resUserById = CRUD::GetById('users','id',$_GET["id"]);
     $user = $resUserById[0];
 }
+if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"])){
+    $id = $_POST["id"];
+    $username = $_POST["username"];
+    $email = $_POST["email"];
+    $bio = $_POST["bio"];
+    $data = array(
+        "username"=>$username,
+        "email"=>$email,
+        "bio"=>$bio,
+    );
+
+    $result = CRUD::Edit($id,'users',$data);
+    if ($result){
+        header("Location: TableUsers.php");
+    }else{
+        header("Location: Edit.php");
+    }
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -328,10 +347,11 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                 <!-- Page Heading -->
                 <h1 class="h3 mb-2 text-gray-800">Edit Information</h1>
 
-                <form>
+                <form method="POST">
                     <div class="form-group">
                         <label for="exampleInputEmail1">Username</label>
                         <input type="text" name="username" class="form-control"  value="<?= $user['username']?>" placeholder="Username">
+                        <input type="hidden" name="id" class="form-control"  value="<?= $user['id']?>">
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email</label>

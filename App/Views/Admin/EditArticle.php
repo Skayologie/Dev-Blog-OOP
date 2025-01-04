@@ -2,12 +2,32 @@
 
 use App\Controller\operationsController;
 use App\Controller\usersController;
+use App\Modules\CRUD;
 
 require __DIR__."/../../../vendor/autoload.php";
-$resUser = usersController::GetUsers();
 
 if (isset($_GET["id"]) && isset($_GET["op"])){
-    operationsController::operation($_GET["id"],$_GET["op"],"users","id",'TableUsers.php');
+    $resCategorieById = CRUD::GetById('categories','id',$_GET["id"]);
+    $Categorie = $resCategorieById[0];
+    var_dump($Categorie);
+}
+if(isset($_POST["CategorieName"]) && isset($_POST["CategorieID"]) ){
+    $id = $_POST["id"];
+    $username = $_POST["username"];
+    $email = $_POST["email"];
+    $bio = $_POST["bio"];
+    $data = array(
+        "username"=>$username,
+        "email"=>$email,
+        "bio"=>$bio,
+    );
+    $result = CRUD::Edit($id,'articles',$data);
+    if ($result){
+        header("Location:TableUsers.php");
+    }else{
+        header("Location:EditCategorie.php");
+    }
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -26,8 +46,8 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
     <!-- Custom fonts for this template -->
     <link href="../../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
-            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-            rel="stylesheet">
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="../../../public/css/sb-admin-2.min.css" rel="stylesheet">
@@ -85,7 +105,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                 </div>
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Articles</h6>
-                        <a class="collapse-item" href="./Articles.php">Articles</a>
+                    <a class="collapse-item" href="./Articles.php">Articles</a>
                 </div>
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Tags</h6>
@@ -127,7 +147,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
 
                 <!-- Topbar Search -->
                 <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
                         <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
                                aria-label="Search" aria-describedby="basic-addon2">
@@ -325,60 +345,19 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-2 text-gray-800">Manage Users</h1>
+                <h1 class="h3 mb-2 text-gray-800">Edit Information</h1>
 
-                <!-- DataTales Example -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 justify-content-between d-flex">
-                        <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                            Users
-                        </h6>
-                        <a href="ArchivedUsers.php">
-                            <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Archived Users
-                            </h6>
-                        </a>
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Username</label>
+                        <input type="text" name="CategorieName" class="form-control"  value="<?= $Categorie['name']?>" placeholder="Username">
+                        <input type="hidden" name="CategorieID" class="form-control"  value="<?= $Categorie['id']?>">
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th>Operations</th>
-                                </tr>
-                                </thead>
-                                <tfoot>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th></th>
-                                </tr>
-                                </tfoot>
-                                <tbody>
-                                <?php foreach ($resUser as $row):?>
-                                    <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="Edit.php?id=<?= $row['id']?>&op=edit"><button type="button" class="btn btn-info"><i class="fa-solid fa-pen-to-square"></i></button></a>
-                                            <a href="TableUsers.php?id=<?= $row['id']?>&op=archive"><button type="button" class="btn btn-danger"><i class="fa-solid fa-ban"></i></button></a>
 
-                                        </td>
-                                    </tr>
-                                <?php endforeach;?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+
+
+                    <button type="submit" class="btn btn-warning">Update</button>
+                </form>
 
             </div>
             <!-- /.container-fluid -->
@@ -443,7 +422,6 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
 
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
-<script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
 
 </body>
 

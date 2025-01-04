@@ -7,15 +7,24 @@ use App\Modules\CRUD;
 
 class operationsController
 {
-    public static function operation($id,$operation,$table,$coll){
+    public static function operation($id,$operation,$table,$coll,$returnTo){
         if ($operation == "archive"){
-            Admin::archive($id,$table,$coll);
+            if (Admin::archive($id,$table,$coll)){
+                header("Location:$returnTo");
+                exit();
+            }
         }
         elseif ($operation == "restore"){
-            Admin::restore($id,$table,$coll);
+            if (Admin::restore($id,$table,$coll)){
+                header("Location:$returnTo");
+                exit();
+            }
         }
         elseif ($operation == "Delete"){
-            CRUD::Delete($id,$table,$coll);
+            if (CRUD::Delete($id,$table,$coll)){
+                header("Location:$returnTo");
+                exit();
+            }
         }
     }
 }

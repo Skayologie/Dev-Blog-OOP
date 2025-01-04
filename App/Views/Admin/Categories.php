@@ -353,8 +353,8 @@ $resCategories = categoriesController::GetCategories();
                                             <td><?= $row['id']?></td>
                                             <td><?= $row['name']?></td>
                                             <td>
-                                                <button type="button" class="btn btn-danger">Delete</button>
-                                                <button type="button" class="btn btn-info">Edit</button>
+                                                <a href="Categories.php?id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
+                                                <a href="EditCategorie.php?id=<?= $row['id']?>&op=edit&type=categories"><button type="button" class="btn btn-info">Edit</button></a>
                                             </td>
                                         </tr>
                                     <?php endforeach ;?>

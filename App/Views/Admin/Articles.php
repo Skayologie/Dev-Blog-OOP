@@ -335,8 +335,11 @@ $resAuthors = usersController::GetUsers();
                                 <tr>
                                     <th>ID</th>
                                     <th>Title</th>
+                                    <th>Views</th>
                                     <th>Auteur</th>
-                                    <th>Content</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
                                     <th>Operations</th>
                                 </tr>
                                 </thead>
@@ -344,8 +347,11 @@ $resAuthors = usersController::GetUsers();
                                 <tr>
                                     <th>ID</th>
                                     <th>Title</th>
+                                    <th>Views</th>
                                     <th>Auteur</th>
                                     <th>Content</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
                                     <th></th>
                                 </tr>
                                 </tfoot>
@@ -356,11 +362,23 @@ $resAuthors = usersController::GetUsers();
                                             <?php if ($row["author_id"] == $AuthorRow["id"]): ?>
                                                 <td><?= $row['id']?></td>
                                                 <td><?= $row['title']?></td>
+                                                <td><?= $row['views']?></td>
                                                 <td><?= $AuthorRow['username']?></td>
-                                                <td><?= $row['content']?></td>
-                                                <td>
-                                                    <button type="button" class="btn btn-warning">Archive</button>
-                                                    <button type="button" class="btn btn-info">Edit</button>
+                                                <td class="d-flex align-items-center justify-content-center">
+                                                    <p  class="text-white px-2 rounded
+                                                    <?php
+                                                            if ($row['status'] == "published"){echo "bg-success";}
+                                                            elseif ($row['status'] == "pending"){echo "bg-warning";}
+                                                            else{echo "bg-danger";}?>">
+                                                            <?= $row['status'] ?>
+                                                    </p>
+                                                </td>
+                                                <td><?= $row['created_at']?></td>
+                                                <td><?= $row['updated_at']?></td>
+
+                                                <td class="flex ">
+                                                    <button type="button" class="btn btn-info w-auto"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-box-archive"></i></button>
                                                 </td>
                                             <?php endif; ?>
                                         </tr>
@@ -435,7 +453,7 @@ $resAuthors = usersController::GetUsers();
 
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
-
+<script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
 </body>
 
 </html>

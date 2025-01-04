@@ -52,14 +52,16 @@ class CRUD
         }
     }
 
-    public static function Edit($id,$table,$col){
+    public static function Edit($id,$table,$data){
         $conn = Database::getConnection();
-        $sql = "UPDATE $table SET isDeleted = 1 WHERE $col = $id";
-        if ($conn->exec($sql)){
-            return true;
-        }else{
-            return false;
+        $args = array();
+
+        foreach ($data as $key => $value) {
+            $args[] = "$key = ?";
         }
+        $sql = "UPDATE $table SET " . implode(',', $args) . " WHERE id = $id";
+        $stmt = $conn->prepare($sql);
+        return $stmt->execute(array_values($data));
     }
 }
 
