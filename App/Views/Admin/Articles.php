@@ -1,10 +1,15 @@
 <?php
 require __DIR__."/../../../vendor/autoload.php";
 use App\Controller\articleController;
+use App\Controller\operationsController;
 use App\Controller\usersController;
 
 $resArticles = articleController::GetArticles();
 $resAuthors = usersController::GetUsers();
+if (isset($_GET["id"]) && isset($_GET["op"])){
+    operationsController::operation($_GET["id"],$_GET["op"],"articles","id",'Articles.php');
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -325,8 +330,22 @@ $resAuthors = usersController::GetUsers();
 
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Articles</h6>
+                    <div class="card-header py-3 justify-content-between d-flex">
+                        <h6 class="m-0 align-content-center font-weight-bold text-primary">
+                            Articles
+                        </h6>
+                        <div class="d-flex ">
+                            <a href="Archived.php?target=articles&status=pending">
+                                <h6 class="m-0 bg-warning font-weight-bold text-light p-2 ">
+                                    Pending Articles
+                                </h6>
+                            </a>
+                            <a href="Archived.php?target=articles">
+                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
+                                    Archived Articles
+                                </h6>
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -338,6 +357,8 @@ $resAuthors = usersController::GetUsers();
                                     <th>Views</th>
                                     <th>Auteur</th>
                                     <th>Status</th>
+                                    <th>Tags</th>
+                                    <th>categorie</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Operations</th>
@@ -350,40 +371,39 @@ $resAuthors = usersController::GetUsers();
                                     <th>Views</th>
                                     <th>Auteur</th>
                                     <th>Content</th>
+                                    <th>categorie</th>
                                     <th>Created At</th>
                                     <th>Updated At</th>
                                     <th></th>
                                 </tr>
                                 </tfoot>
                                 <tbody>
-                                <?php foreach ($resArticles as $row):?>
-                                    <?php foreach ($resAuthors as $AuthorRow):?>
+                                    <?php foreach ($resArticles as $row):?>
                                         <tr>
-                                            <?php if ($row["author_id"] == $AuthorRow["id"]): ?>
-                                                <td><?= $row['id']?></td>
-                                                <td><?= $row['title']?></td>
-                                                <td><?= $row['views']?></td>
-                                                <td><?= $AuthorRow['username']?></td>
-                                                <td class="d-flex align-items-center justify-content-center">
-                                                    <p  class="text-white px-2 rounded
-                                                    <?php
-                                                            if ($row['status'] == "published"){echo "bg-success";}
-                                                            elseif ($row['status'] == "pending"){echo "bg-warning";}
-                                                            else{echo "bg-danger";}?>">
-                                                            <?= $row['status'] ?>
-                                                    </p>
-                                                </td>
-                                                <td><?= $row['created_at']?></td>
-                                                <td><?= $row['updated_at']?></td>
+                                            <td><?= $row['ArticleId']?></td>
+                                            <td><?= $row['title']?></td>
+                                            <td><?= $row['views']?></td>
+                                            <td><?= $row['author_name']?></td>
+                                            <td class="d-flex align-items-center justify-content-center">
+                                                <p  class="text-white px-2 rounded
+                                                <?php
+                                                        if ($row['status'] == "published"){echo "bg-success";}
+                                                        elseif ($row['status'] == "pending"){echo "bg-warning";}
+                                                        else{echo "bg-danger";}?>">
+                                                        <?= $row['status'] ?>
+                                                </p>
+                                            </td>
+                                            <td><?= $row['tags']?></td>
+                                            <td><?= $row['category_name']?></td>
+                                            <td><?= $row['created_at']?></td>
+                                            <td><?= $row['updated_at']?></td>
 
-                                                <td class="flex ">
-                                                    <button type="button" class="btn btn-info w-auto"><i class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-box-archive"></i></button>
-                                                </td>
-                                            <?php endif; ?>
+                                            <td class="flex ">
+                                                <a href="Articles.php?id=<?= $row['ArticleId']?>&op=edit"><button type="button" class="btn btn-info w-auto"><i class="fa-solid fa-pen-to-square"></i></button></a>
+                                                <a href="Articles.php?id=<?= $row['ArticleId']?>&op=archive"><button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-box-archive"></i></button></a>
+                                            </td>
                                         </tr>
                                     <?php endforeach;?>
-                                <?php endforeach;?>
                                 </tbody>
                             </table>
                         </div>

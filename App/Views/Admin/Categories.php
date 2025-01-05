@@ -1,8 +1,12 @@
 <?php
 use App\Controller\categoriesController;
+use App\Controller\operationsController;
 
 require __DIR__."/../../../vendor/autoload.php";
 $resCategories = categoriesController::GetCategories();
+if (isset($_GET["id"]) && isset($_GET["op"])){
+    operationsController::operation($_GET["id"],$_GET["op"],"categories","id",'Categories.php');
+}
 ?>
 
 <!DOCTYPE html>

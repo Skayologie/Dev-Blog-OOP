@@ -6,7 +6,7 @@ use App\Modules\CRUD;
 
 require __DIR__."/../../../vendor/autoload.php";
 
-if (isset($_GET["id"]) && isset($_GET["op"])){
+if (isset($_GET["id"])){
     $resUserById = CRUD::GetById('users','id',$_GET["id"]);
     $user = $resUserById[0];
 }
@@ -23,9 +23,9 @@ if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"])){
 
     $result = CRUD::Edit($id,'users',$data);
     if ($result){
-        header("Location: TableUsers.php");
+        header("Location:TableUsers.php");
     }else{
-        header("Location: Edit.php");
+        header("Location:Edit.php");
     }
     exit();
 }

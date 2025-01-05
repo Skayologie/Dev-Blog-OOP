@@ -22,7 +22,6 @@ class User{
                 echo "done";
             }else{
                 echo "Didnt done";
-
             }
         }else{
             echo "Connected Failed";

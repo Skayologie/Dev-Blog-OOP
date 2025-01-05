@@ -1,13 +1,21 @@
 <?php
 
+use App\Controller\articleController;
+use App\Controller\categoriesController;
 use App\Controller\operationsController;
+use App\Controller\tagsController;
 use App\Controller\usersController;
 
 require __DIR__."/../../../vendor/autoload.php";
 $resUser = usersController::GetUsers();
+$resCategorie = categoriesController::GetCategories();
+$resTags = tagsController::GetTags();
 
-if (isset($_GET["id"]) && isset($_GET["op"])){
-    operationsController::operation($_GET["id"],$_GET["op"],"users","id",'TableUsers.php');
+if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) ){
+    $categorieID = intval($_POST["categorie"]);
+    $authorID = intval($_POST["author"]);
+    $tags = $_POST["tagsInput"];
+    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$categorieID,$authorID,$tags);
 }
 ?>
 <!DOCTYPE html>
@@ -331,53 +339,61 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 justify-content-between d-flex">
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                            Users
+                            Add Article
                         </h6>
-                        <a href="Archived.php?target=users">
-                            <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Archived Users
-                            </h6>
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th>Operations</th>
-                                </tr>
-                                </thead>
-                                <tfoot>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th></th>
-                                </tr>
-                                </tfoot>
-                                <tbody>
-                                <?php foreach ($resUser as $row):?>
-                                    <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="Edit.php?id=<?= $row['id']?>&op=edit"><button type="button" class="btn btn-info"><i class="fa-solid fa-pen-to-square"></i></button></a>
-                                            <a href="TableUsers.php?id=<?= $row['id']?>&op=archive"><button type="button" class="btn btn-danger"><i class="fa-solid fa-ban"></i></button></a>
 
-                                        </td>
-                                    </tr>
-                                <?php endforeach;?>
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
+                    <form method="POST"  class="w-25">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1"  class="form-label">Title</label>
+                            <input name="title" type="text" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Content</label>
+                            <textarea name="content" class="form-control" aria-describedby="emailHelp"></textarea>
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Categories</label>
+                            <select name="categorie" class="form-control" aria-describedby="emailHelp" >
+                                <option selected disabled>
+                                    Choose Categorie
+                                </option>
+                                <?php foreach ($resCategorie as $rowUser): ?>
+                                    <option value="<?php echo $rowUser["id"]; ?>">
+                                        <?php echo $rowUser["name"]; ?>
+                                    </option>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
+
+                        <?php foreach ($resTags as $tagRow): ?>
+                            <div class="form-check form-check-inline">
+                                <input name="tagsInput[]" class="form-check-input" type="checkbox" id="inlineCheckbox<?= $tagRow['id'] ?>" value="<?= $tagRow['id'] ?>">
+                                <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name'] ?></label>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Author Number :</label>
+                            <select name="author" class="form-control" aria-describedby="emailHelp" >
+                                <option selected disabled>
+                                    Author Id
+                                </option>
+                                <?php foreach ($resUser as $rowUser): ?>
+                                    <option value="<?php echo $rowUser["id"]; ?>">
+                                        <?php echo $rowUser["username"]; ?>
+                                    </option>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Meta Keyword</label>
+                            <input type="text" name="meta" class="form-control" >
+                        </div>
+
+                        <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+                    </form>
                 </div>
 
             </div>
@@ -444,6 +460,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
 <script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
 

@@ -26,5 +26,11 @@ class operationsController
                 exit();
             }
         }
+        elseif ($operation == "Accept"){
+            if (CRUD::Accept($id,$table,$coll)){
+                header("Location:$returnTo");
+                exit();
+            }
+        }
     }
 }

@@ -6,9 +6,7 @@ use App\Controller\usersController;
 require __DIR__."/../../../vendor/autoload.php";
 $resArchived = usersController::GetArchivedUsers();
 
-if (isset($_GET["id"]) && isset($_GET["op"])){
-    operationsController::operation($_GET["id"],$_GET["op"],"users","id","ArchivedUsers.php");
-}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

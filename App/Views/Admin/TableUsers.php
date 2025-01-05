@@ -333,7 +333,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
                             Users
                         </h6>
-                        <a href="ArchivedUsers.php">
+                        <a href="Archived.php?target=users">
                             <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
                                 Archived Users
                             </h6>
@@ -361,19 +361,19 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                 </tr>
                                 </tfoot>
                                 <tbody>
-                                <?php foreach ($resUser as $row):?>
-                                    <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="Edit.php?id=<?= $row['id']?>&op=edit"><button type="button" class="btn btn-info"><i class="fa-solid fa-pen-to-square"></i></button></a>
-                                            <a href="TableUsers.php?id=<?= $row['id']?>&op=archive"><button type="button" class="btn btn-danger"><i class="fa-solid fa-ban"></i></button></a>
+                                    <?php foreach ($resUser as $row):?>
+                                        <tr>
+                                            <td><?= $row['id']?></td>
+                                            <td><?= $row['username']?></td>
+                                            <td><?= $row['email']?></td>
+                                            <td><?= $row['bio']?></td>
+                                            <td>
+                                                <a href="Edit.php?id=<?= $row['id']?>"><button type="button" class="btn btn-info"><i class="fa-solid fa-pen-to-square"></i></button></a>
+                                                <a href="TableUsers.php?id=<?= $row['id']?>&op=archive"><button type="button" class="btn btn-danger"><i class="fa-solid fa-ban"></i></button></a>
 
-                                        </td>
-                                    </tr>
-                                <?php endforeach;?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach;?>
                                 </tbody>
                             </table>
                         </div>

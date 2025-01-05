@@ -2,6 +2,7 @@
 namespace App\Modules;
 
 use App\config\Database;
+use PDO;
 
 require realpath(__DIR__ . "/../../vendor/autoload.php");
 
@@ -12,9 +13,9 @@ class CRUD
         $sql = "INSERT INTO " . $table . " (" . implode(',', $columns) . ") VALUES (" . $placeholders . ")";
         $stmt = $conn->prepare($sql);
         if ($stmt->execute($values)) {
-            echo "Inserted successfully!";
+            return true;
         } else {
-            echo "Insertion failed.";
+            echo false;
         }
     }
 
@@ -26,8 +27,39 @@ class CRUD
         } else {
             return false;
         }
-
     }
+    public static function GetArticles($isArchived){
+        $conn = Database::getConnection();
+        $sql = "SELECT * ,
+        articles.id AS ArticleId, 
+        articles.title AS title, 
+        users.username AS author_name, 
+        categories.name AS category_name, 
+        GROUP_CONCAT(tags.name) AS tags, 
+        articles.views, 
+        articles.created_at
+        FROM articles
+        LEFT JOIN 
+            users ON articles.author_id = users.id
+        LEFT JOIN
+            categories ON articles.category_id = categories.id
+        LEFT JOIN
+            article_tags ON articles.id = article_tags.article_id
+        LEFT JOIN
+            tags ON article_tags.tag_id = tags.id
+        WHERE articles.isArchived = $isArchived 
+        GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at";
+        $stmt = $conn->prepare($sql);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll();
+        } else {
+            return false;
+        }
+    }
+    public static function AcceptArticle(){
+        
+    }
+   
 
     public static function GetById($table,$colID,$id){
         $conn = Database::getConnection();
@@ -40,7 +72,6 @@ class CRUD
         }
 
     }
-
 
     public static function Delete($id,$table,$col){
         $conn = Database::getConnection();
@@ -55,7 +86,7 @@ class CRUD
     public static function Edit($id,$table,$data){
         $conn = Database::getConnection();
         $args = array();
-
+        
         foreach ($data as $key => $value) {
             $args[] = "$key = ?";
         }
@@ -63,6 +94,14 @@ class CRUD
         $stmt = $conn->prepare($sql);
         return $stmt->execute(array_values($data));
     }
-}
 
+    public static function GetLastID($table , $idCol){
+        $conn = Database::getConnection();
+        $sql = "SELECT $idCol FROM $table ORDER BY $idCol DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $lastID = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $lastID[0]["id"];
+    }
+}
 

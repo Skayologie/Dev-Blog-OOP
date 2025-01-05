@@ -2,12 +2,28 @@
 
 use App\Controller\operationsController;
 use App\Controller\usersController;
+use App\Controller\articleController;
 
 require __DIR__."/../../../vendor/autoload.php";
-$resArchived = usersController::GetArchivedUsers();
 
-if (isset($_GET["id"]) && isset($_GET["op"])){
-    operationsController::operation($_GET["id"],$_GET["op"],"users","id","ArchivedUsers.php");
+if (isset($_GET["id"]) && isset($_GET["op"]) && isset($_GET["target"])){
+    operationsController::operation($_GET["id"],$_GET["op"],$_GET["target"],"id",'Archived.php?target='.$_GET["target"]);
+}
+
+if (isset($_GET["target"]) && !isset($_GET["status"])){
+    if ($_GET["target"]=="users"){
+        $results = usersController::GetArchivedUsers();
+    }elseif($_GET["target"]=="articles"){
+        $resArticles = articleController::GetArchivedArticles();
+    }else{
+        header("Location:TableUsers.php");
+    }
+}elseif(isset($_GET["target"]) && isset($_GET["status"])){
+    if ($_GET["target"]=="articles" && $_GET["status"]=="pending"){
+        $resultsPending = articleController::GetPendingArticles();
+    }
+}else{
+    header("Location:TableUsers.php");
 }
 ?>
 <!DOCTYPE html>
@@ -325,59 +341,217 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-2 text-gray-800">Manage Users</h1>
+                <h1 class="h3 mb-2 text-gray-800">Manage <?= $_GET["target"] ?></h1>
 
-                <!-- DataTales Example -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 justify-content-between d-flex">
-                        <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                            Users
-                        </h6>
-                        <a href="TableUsers.php">
-                            <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Normal Users
+                <!-- DataTables Users -->
+                <?php if (isset($_GET["target"]) && $_GET["target"] == "users"): ?>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 justify-content-between d-flex">
+                            <h6 class="m-0 align-content-center font-weight-bold text-primary">
+                                Users
                             </h6>
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th>Operations</th>
-                                </tr>
-                                </thead>
-                                <tfoot>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th></th>
-                                </tr>
-                                </tfoot>
-                                <tbody>
-                                <?php foreach ($resArchived as $row):?>
+                            <a href="TableUsers.php">
+                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
+                                    Normal Users
+                                </h6>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
                                     <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
-                                        </td>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Bio</th>
+                                        <th>Operations</th>
                                     </tr>
-                                <?php endforeach;?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Bio</th>
+                                        <th></th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    <?php foreach ($results as $row):?>
+                                        <tr>
+                                            <td><?= $row['id']?></td>
+                                            <td><?= $row['username']?></td>
+                                            <td><?= $row['email']?></td>
+                                            <td><?= $row['bio']?></td>
+                                            <td>
+                                                <a href="Archived.php?target=users&id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
+                                                <a href="Archived.php?target=users&id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach;?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
+                <?php endif; ?>
+
+                <!-- DataTables Articles -->
+                <?php if (isset($_GET["target"]) && !isset($_GET["status"]) 
+                            && $_GET["target"] == "articles"): ?>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 justify-content-between d-flex">
+                            <h6 class="m-0 align-content-center font-weight-bold text-primary">
+                                <?= $_GET["target"] ?>
+                            </h6>
+                            <a href="Articles.php">
+                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
+                                    All <?= $_GET["target"] ?>
+                                </h6>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Views</th>
+                                        <th>Auteur</th>
+                                        <th>Status</th>
+                                        <th>Tags</th>
+                                        <th>categorie</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th>Operations</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Views</th>
+                                        <th>Auteur</th>
+                                        <th>Content</th>
+                                        <th>categorie</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th></th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        <?php foreach ($resArticles as $row):?>
+                                            <tr>
+                                                <td><?= $row['ArticleId']?></td>
+                                                <td><?= $row['title']?></td>
+                                                <td><?= $row['views']?></td>
+                                                <td><?= $row['author_name']?></td>
+                                                <td class="d-flex align-items-center justify-content-center">
+                                                    <p  class="text-white px-2 rounded
+                                                    <?php
+                                                            if ($row['status'] == "published"){echo "bg-success";}
+                                                            elseif ($row['status'] == "pending"){echo "bg-warning";}
+                                                            else{echo "bg-danger";}?>">
+                                                            <?= $row['status'] ?>
+                                                    </p>
+                                                </td>
+                                                <td><?= $row['tags']?></td>
+                                                <td><?= $row['category_name']?></td>
+                                                <td><?= $row['created_at']?></td>
+                                                <td><?= $row['updated_at']?></td>
+
+                                                <td class="flex ">
+                                                    <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=delete"><button type="button" class="btn btn-danger w-auto"><i class="fa-solid fa-trash"></i></button></a>
+                                                    <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=restore"><button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-arrow-up-from-bracket"></i></button></a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach;?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif ; ?>
+
+                <!-- DataTables Pending Articles -->
+                <?php if (isset($_GET["target"]) && $_GET["target"] == "articles" &&
+                          isset($_GET["status"]) && $_GET["status"] == "pending"): ?>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 justify-content-between d-flex">
+                            <h6 class="m-0 align-content-center font-weight-bold text-primary">
+                                <?= $_GET["target"] ?>
+                            </h6>
+                            <a href="Articles.php">
+                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
+                                    All <?= $_GET["target"] ?>
+                                </h6>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Views</th>
+                                        <th>Auteur</th>
+                                        <th>Status</th>
+                                        <th>Tags</th>
+                                        <th>categorie</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th>Operations</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Views</th>
+                                        <th>Auteur</th>
+                                        <th>Content</th>
+                                        <th>categorie</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th></th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        <?php foreach ($resultsPending as $row):?>
+                                            <tr>
+                                                <td><?= $row['ArticleId']?></td>
+                                                <td><?= $row['title']?></td>
+                                                <td><?= $row['views']?></td>
+                                                <td><?= $row['author_name']?></td>
+                                                <td class="d-flex align-items-center justify-content-center">
+                                                    <p  class="text-white px-2 rounded
+                                                    <?php
+                                                            if ($row['status'] == "published"){echo "bg-success";}
+                                                            elseif ($row['status'] == "pending"){echo "bg-warning";}
+                                                            else{echo "bg-danger";}?>">
+                                                            <?= $row['status'] ?>
+                                                    </p>
+                                                </td>
+                                                <td><?= $row['tags']?></td>
+                                                <td><?= $row['category_name']?></td>
+                                                <td><?= $row['created_at']?></td>
+                                                <td><?= $row['updated_at']?></td>
+
+                                                <td class="flex ">
+                                                    <a title="Accept Article" href="pending_articles.php?target=articles&id=<?= $row['ArticleId']?>&op=accept"><button type="button" class="btn btn-success w-auto"><i class="fa-solid fa-check"></i></button></a>
+                                                    <a title="Reject Article" href="pending_articles.php?target=articles&id=<?= $row['ArticleId']?>&op=reject"><button type="button" class="btn btn-danger w-auto "><i class="fa-solid fa-xmark"></i></button></a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach;?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif ; ?>
 
             </div>
             <!-- /.container-fluid -->
@@ -442,6 +616,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
 
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
+<script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
 
 </body>
 
