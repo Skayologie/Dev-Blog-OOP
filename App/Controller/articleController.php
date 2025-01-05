@@ -6,11 +6,11 @@ use App\Config\Database;
 use App\Modules\Article;
 use App\Modules\CRUD;
 class articleController{
-    public static function AddArticle($title,$content,$meta,$categorieID,$author_id,$tags)
+    public static function AddArticle($title,$content,$meta,$slug,$cover,$categorieID,$author_id,$tags)
     {
         $db = Database::getConnection();
-       if(CRUD::Add($db,'articles', ["title","content","meta_description","category_id","author_id"],
-            [$title,$content,$meta,$categorieID,$author_id])){
+       if(CRUD::Add($db,'articles', ["title","content","slug","featured_image","meta_description","category_id","author_id"],
+            [$title,$content,$slug,$cover,$meta,$categorieID,$author_id])){
             $lastID = CRUD::GetLastID("articles","id");
             foreach ($tags as $value) {
                 CRUD::Add($db,"article_tags",["article_id","tag_id"],[$lastID,$value]);
@@ -48,6 +48,34 @@ class articleController{
         return $Results;
     }
     
+    public static function create_slug($string) {
+        // Replace non letter or digits by -
+        $string = preg_replace('~[^\pL\d]+~u', '-', $string);
+    
+        // Transliterate
+        if (function_exists('iconv')) {
+            $string = iconv('utf-8', 'us-ascii//TRANSLIT', $string);
+        }
+    
+        // Remove unwanted characters
+        $string = preg_replace('~[^-\w]+~', '', $string);
+    
+        // Trim
+        $string = trim($string, '-');
+    
+        // Remove duplicate -
+        $string = preg_replace('~-+~', '-', $string);
+    
+        // Lowercase
+        $string = strtolower($string);
+    
+        // If string is empty, return 'n-a'
+        if (empty($string)) {
+            return 'n-a';
+        }
+    
+        return $string;
+    }
 }
 
 

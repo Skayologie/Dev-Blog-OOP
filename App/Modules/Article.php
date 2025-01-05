@@ -6,7 +6,7 @@ use PDO;
 
 require realpath(__DIR__ . "/../../vendor/autoload.php");
 
-class Article
+class article
 {
     public static function GetArticleStatus($status){
         $conn = Database::getConnection();

@@ -411,7 +411,10 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                 <div style="position:absolute;<?php if($ArticleRow['status'] === "published"){echo "background:green;"; } 
                                                                 elseif($ArticleRow['status'] === "pending"){echo "background:#f6c23e;"; } 
                                                                 elseif($ArticleRow['status'] === "rejected"){echo "background:red;" ;} ?>padding-inline:10px;margin:5px;color:white;border-radius:20px;"><?= $ArticleRow["status"] ?></div>
-                                <img class="card-img-top" src="../../../public/img/undraw_posting_photo.svg" alt="Card image cap">
+                                <div style="width:100%;height:200px;">
+
+                                    <img style="height: 100%; width:100%;object-fit:cover;" class="card-img-top " src="./../../../public/img/covers/reference<?=$ArticleRow["featured_image"]?>" alt="Card image cap">
+                                </div>
                                 <div class="card-body">
                                     <h5 class="card-title"><?= $ArticleRow["title"] ?></h5>
                                     <p style='text-overflow: ellipsis;overflow: hidden; white-space: nowrap;' class="card-text"><?= $ArticleRow["content"] ?></p>

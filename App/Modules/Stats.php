@@ -17,6 +17,19 @@ class Stats{
             echo false;
         }
     }
+    public static function get_category_stats(){
+        $conn = Database::getConnection();
+        $sql = "SELECT 
+        categories.id , 
+        categories.name AS CatName, 
+        COUNT(articles.id) AS article_count 
+        FROM articles 
+        JOIN categories ON categories.id = articles.category_id 
+        GROUP BY categories.id";
+        $result = $conn->query($sql);
+        $resultQuery = $result->fetchAll(PDO::FETCH_ASSOC);
+        return ($resultQuery);
+    }
 }
 $TotalUsers = Stats::Total("users");
 $TotalArticles = Stats::Total("articles");

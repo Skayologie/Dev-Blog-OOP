@@ -333,7 +333,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                     <div class="card-header py-3 justify-content-between d-flex">
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
                             Articles
-                        </h6>
+                        </h6>   
                         <div class="d-flex ">
                             <a href="Archived.php?target=articles&status=pending">
                                 <h6 class="m-0 bg-warning font-weight-bold text-light p-2 ">

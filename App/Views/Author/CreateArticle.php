@@ -5,18 +5,26 @@ use App\Controller\categoriesController;
 use App\Controller\operationsController;
 use App\Controller\tagsController;
 use App\Controller\usersController;
+use App\Modules\FileHandler;
 
 require __DIR__."/../../../vendor/autoload.php";
 $resUser = usersController::GetUsers();
 $resCategorie = categoriesController::GetCategories();
 $resTags = tagsController::GetTags();
-
-if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) ){
+// 
+if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) && isset($_FILES["coverImage"])){
     $categorieID = intval($_POST["categorie"]);
     $authorID = intval($_POST["author"]);
+    $Cover = $_FILES["coverImage"];
     $tags = $_POST["tagsInput"];
-    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$categorieID,$authorID,$tags);
+    $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    $slug = articleController::create_slug($_POST["title"]);
+    $path = realpath(__DIR__."/../../../public/img/covers/reference/");
+    $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"]);
+    
+    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
 }
+echo realpath(__DIR__.'/../../vendor/autoload.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -87,24 +95,8 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Management</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Users</h6>
-                    <a class="collapse-item" href="./TableUsers.php">Users</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Articles</h6>
-                        <a class="collapse-item" href="./Articles.php">Articles</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Tags</h6>
-                    <a class="collapse-item" href="../../../Pages/buttons.html">Tags</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Categories</h6>
-                    <a class="collapse-item" href="Categories.php">Categories</a>
-                </div>
-            </div>
+            
+            
         </li>
 
 
@@ -345,7 +337,7 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
 
                     </div>
                     <div class="w-100 flex justify-center">
-                    <form method="POST"  class="w-50 d-flex flex-col">
+                    <form method="POST"  class="w-50 d-flex flex-col"  enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="exampleInputEmail1"  class="form-label">Title</label>
                             <input name="title" type="text" class="form-control">
@@ -354,6 +346,15 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
                             <label for="exampleInputEmail1" class="form-label">Content</label>
                             <textarea name="content" class="form-control" aria-describedby="emailHelp"></textarea>
 
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Upload Cover</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="coverImage" id="inputGroupFile01">
+                                <label class="custom-file-label" for="inputGroupFile01">Choose Image</label>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Categories</label>
