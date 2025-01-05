@@ -4,8 +4,9 @@ require realpath(__DIR__."/../../vendor/autoload.php");
 
 use App\Config\Database;
 use App\Modules\Article;
+use App\Modules\Author;
 use App\Modules\CRUD;
-class articleController{
+class authorController{
     public static function AddArticle($title,$content,$meta,$categorieID,$author_id,$tags)
     {
         $db = Database::getConnection();
@@ -20,9 +21,9 @@ class articleController{
 
     }
 
-    public static function GetArticles()
+    public static function GetArticles($id)
     {
-        $Results = CRUD::GetArticles(0);
+        $Results = Author::GetOwnArticles($id,0,'published');
         return $Results;
     }
 

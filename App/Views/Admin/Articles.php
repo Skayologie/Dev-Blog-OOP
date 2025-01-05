@@ -4,7 +4,7 @@ use App\Controller\articleController;
 use App\Controller\operationsController;
 use App\Controller\usersController;
 
-$resArticles = articleController::GetArticles();
+$resArticles = articleController::GetPublishedArticle();
 $resAuthors = usersController::GetUsers();
 if (isset($_GET["id"]) && isset($_GET["op"])){
     operationsController::operation($_GET["id"],$_GET["op"],"articles","id",'Articles.php');

@@ -26,8 +26,14 @@ class operationsController
                 exit();
             }
         }
-        elseif ($operation == "Accept"){
-            if (CRUD::Accept($id,$table,$coll)){
+        elseif ($operation == "accept"){
+            if (CRUD::AcceptArticle($id)){
+                header("Location:$returnTo");
+                exit();
+            }
+        }
+        elseif ($operation == "reject"){
+            if (CRUD::AcceptArticle($id)){
                 header("Location:$returnTo");
                 exit();
             }

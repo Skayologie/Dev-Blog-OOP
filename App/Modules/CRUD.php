@@ -28,6 +28,7 @@ class CRUD
             return false;
         }
     }
+
     public static function GetArticles($isArchived){
         $conn = Database::getConnection();
         $sql = "SELECT * ,
@@ -56,10 +57,20 @@ class CRUD
             return false;
         }
     }
-    public static function AcceptArticle(){
-        
+
+    public static function AcceptArticle($id){
+        $conn = Database::getConnection();
+        $sql = "UPDATE articles SET status = 'published' WHERE id = $id";
+        $stmt = $conn->prepare($sql);
+        return $stmt->execute();
     }
-   
+    
+    public static function RejectArticle($id){
+        $conn = Database::getConnection();
+        $sql = "UPDATE articles SET status = 'published' WHERE id = $id";
+        $stmt = $conn->prepare($sql);
+        return $stmt->execute();
+    }
 
     public static function GetById($table,$colID,$id){
         $conn = Database::getConnection();

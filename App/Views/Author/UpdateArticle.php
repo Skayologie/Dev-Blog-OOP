@@ -1,32 +1,21 @@
 <?php
 
-use App\Controller\operationsController;
-use App\Controller\usersController;
 use App\Controller\articleController;
+use App\Controller\categoriesController;
+use App\Controller\operationsController;
+use App\Controller\tagsController;
+use App\Controller\usersController;
 
 require __DIR__."/../../../vendor/autoload.php";
+$resUser = usersController::GetUsers();
+$resCategorie = categoriesController::GetCategories();
+$resTags = tagsController::GetTags();
 
-if (isset($_GET["id"]) && isset($_GET["op"]) && isset($_GET["target"])){
-    operationsController::operation($_GET["id"],$_GET["op"],$_GET["target"],"id",'Archived.php?target='.$_GET["target"]);
-}
-
-if (isset($_GET["target"]) && !isset($_GET["status"])){
-    if ($_GET["target"]=="users"){
-        $results = usersController::GetArchivedUsers();
-    }elseif($_GET["target"]=="articles"){
-        $resArticles = articleController::GetArchivedArticles();
-    }else{
-        header("Location:TableUsers.php");
-    }
-}elseif(isset($_GET["target"]) && isset($_GET["status"])){
-    if ($_GET["target"]=="articles" && $_GET["status"]=="pending"){
-        $resultsPending = articleController::GetPendingArticles();
-    }
-    elseif ($_GET["target"]=="articles" && $_GET["status"]=="published"){
-        $resultsPending = articleController::GetPendingArticles();
-    }
-}else{
-    header("Location:TableUsers.php");
+if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) ){
+    $categorieID = intval($_POST["categorie"]);
+    $authorID = intval($_POST["author"]);
+    $tags = $_POST["tagsInput"];
+    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$categorieID,$authorID,$tags);
 }
 ?>
 <!DOCTYPE html>
@@ -45,8 +34,8 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
     <!-- Custom fonts for this template -->
     <link href="../../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="../../../public/css/sb-admin-2.min.css" rel="stylesheet">
@@ -104,7 +93,7 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
                 </div>
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Articles</h6>
-                    <a class="collapse-item" href="./Articles.php">Articles</a>
+                        <a class="collapse-item" href="./Articles.php">Articles</a>
                 </div>
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Tags</h6>
@@ -146,7 +135,7 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
 
                 <!-- Topbar Search -->
                 <form
-                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
                         <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
                                aria-label="Search" aria-describedby="basic-addon2">
@@ -344,219 +333,68 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-2 text-gray-800">Manage <?= $_GET["target"] ?></h1>
+                <h1 class="h3 mb-2 text-gray-800">Manage Users</h1>
 
-                <!-- DataTables Users -->
-                <?php if (isset($_GET["target"]) && $_GET["target"] == "users"): ?>
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 justify-content-between d-flex">
-                            <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                                Users
-                            </h6>
-                            <a href="TableUsers.php">
-                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                    Normal Users
-                                </h6>
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Bio</th>
-                                        <th>Operations</th>
-                                    </tr>
-                                    </thead>
-                                    <tfoot>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Bio</th>
-                                        <th></th>
-                                    </tr>
-                                    </tfoot>
-                                    <tbody>
-                                    <?php foreach ($results as $row):?>
-                                        <tr>
-                                            <td><?= $row['id']?></td>
-                                            <td><?= $row['username']?></td>
-                                            <td><?= $row['email']?></td>
-                                            <td><?= $row['bio']?></td>
-                                            <td>
-                                                <a href="Archived.php?target=users&id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
-                                                <a href="Archived.php?target=users&id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach;?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 justify-content-between d-flex">
+                        <h6 class="m-0 align-content-center font-weight-bold text-primary">
+                            Add Article
+                        </h6>
+
                     </div>
-                <?php endif; ?>
-
-                <!-- DataTables Articles -->
-                <?php if (isset($_GET["target"]) && !isset($_GET["status"]) 
-                            && $_GET["target"] == "articles"): ?>
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 justify-content-between d-flex">
-                            <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                                <?= $_GET["target"] ?>
-                            </h6>
-                            <a href="Articles.php">
-                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                    All <?= $_GET["target"] ?>
-                                </h6>
-                            </a>
+                    <form method="POST"  class="w-25">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1"  class="form-label">Title</label>
+                            <input name="title" type="text" class="form-control">
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Views</th>
-                                        <th>Auteur</th>
-                                        <th>Status</th>
-                                        <th>Tags</th>
-                                        <th>categorie</th>
-                                        <th>Created At</th>
-                                        <th>Updated At</th>
-                                        <th>Operations</th>
-                                    </tr>
-                                    </thead>
-                                    <tfoot>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Views</th>
-                                        <th>Auteur</th>
-                                        <th>Status</th>
-                                        <th>Tags</th>
-                                        <th>Content</th>
-                                        <th>categorie</th>
-                                        <th>Created At</th>
-                                        <th>Updated At</th>
-                                        <th></th>
-                                    </tr>
-                                    </tfoot>
-                                    <tbody>
-                                        <?php foreach ($resArticles as $row):?>
-                                            <tr>
-                                                <td><?= $row['ArticleId']?></td>
-                                                <td><?= $row['title']?></td>
-                                                <td><?= $row['views']?></td>
-                                                <td><?= $row['author_name']?></td>
-                                                <td class="d-flex align-items-center justify-content-center">
-                                                    <p  class="text-white px-2 rounded
-                                                    <?php
-                                                            if ($row['status'] == "published"){echo "bg-success";}
-                                                            elseif ($row['status'] == "pending"){echo "bg-warning";}
-                                                            else{echo "bg-danger";}?>">
-                                                            <?= $row['status'] ?>
-                                                    </p>
-                                                </td>
-                                                <td><?= $row['tags']?></td>
-                                                <td><?= $row['category_name']?></td>
-                                                <td><?= $row['created_at']?></td>
-                                                <td><?= $row['updated_at']?></td>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Content</label>
+                            <textarea name="content" class="form-control" aria-describedby="emailHelp"></textarea>
 
-                                                <td class="flex ">
-                                                    <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=delete"><button type="button" class="btn btn-danger w-auto"><i class="fa-solid fa-trash"></i></button></a>
-                                                    <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=restore"><button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-arrow-up-from-bracket"></i></button></a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach;?>
-                                    </tbody>
-                                </table>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Categories</label>
+                            <select name="categorie" class="form-control" aria-describedby="emailHelp" >
+                                <option selected disabled>
+                                    Choose Categorie
+                                </option>
+                                <?php foreach ($resCategorie as $rowUser): ?>
+                                    <option value="<?php echo $rowUser["id"]; ?>">
+                                        <?php echo $rowUser["name"]; ?>
+                                    </option>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
+
+                        <?php foreach ($resTags as $tagRow): ?>
+                            <div class="form-check form-check-inline">
+                                <input name="tagsInput[]" class="form-check-input" type="checkbox" id="inlineCheckbox<?= $tagRow['id'] ?>" value="<?= $tagRow['id'] ?>">
+                                <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name'] ?></label>
                             </div>
-                        </div>
-                    </div>
-                <?php endif ; ?>
+                        <?php endforeach; ?>
 
-                <!-- DataTables Pending Articles -->
-                <?php if (isset($_GET["target"]) && $_GET["target"] == "articles" &&
-                          isset($_GET["status"]) && $_GET["status"] == "pending"): ?>
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 justify-content-between d-flex">
-                            <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                                <?= $_GET["target"] ?>
-                            </h6>
-                            <a href="Articles.php">
-                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                    All <?= $_GET["target"] ?>
-                                </h6>
-                            </a>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Author Number :</label>
+                            <select name="author" class="form-control" aria-describedby="emailHelp" >
+                                <option selected disabled>
+                                    Author Id
+                                </option>
+                                <?php foreach ($resUser as $rowUser): ?>
+                                    <option value="<?php echo $rowUser["id"]; ?>">
+                                        <?php echo $rowUser["username"]; ?>
+                                    </option>
+                                <?php endforeach;?>
+                            </select>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Views</th>
-                                        <th>Auteur</th>
-                                        <th>Status</th>
-                                        <th>Tags</th>
-                                        <th>categorie</th>
-                                        <th>Created At</th>
-                                        <th>Updated At</th>
-                                        <th>Operations</th>
-                                    </tr>
-                                    </thead>
-                                    <tfoot>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Views</th>
-                                        <th>Auteur</th>
-                                        <th>Content</th>
-                                        <th>categorie</th>
-                                        <th>Created At</th>
-                                        <th>Updated At</th>
-                                        <th></th>
-                                    </tr>
-                                    </tfoot>
-                                    <tbody>
-                                        <?php foreach ($resultsPending as $row):?>
-                                            <tr>
-                                                <td><?= $row['ArticleId']?></td>
-                                                <td><?= $row['title']?></td>
-                                                <td><?= $row['views']?></td>
-                                                <td><?= $row['author_name']?></td>
-                                                <td class="d-flex align-items-center justify-content-center">
-                                                    <p  class="text-white px-2 rounded
-                                                    <?php
-                                                            if ($row['status'] == "published"){echo "bg-success";}
-                                                            elseif ($row['status'] == "pending"){echo "bg-warning";}
-                                                            else{echo "bg-danger";}?>">
-                                                            <?= $row['status'] ?>
-                                                    </p>
-                                                </td>
-                                                <td><?= $row['tags']?></td>
-                                                <td><?= $row['category_name']?></td>
-                                                <td><?= $row['created_at']?></td>
-                                                <td><?= $row['updated_at']?></td>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Meta Keyword</label>
+                            <input type="text" name="meta" class="form-control" >
+                        </div>
 
-                                                <td class="flex ">
-                                                    <a title="Accept Article" href="pending_articles.php?target=articles&id=<?= $row['ArticleId']?>&op=accept"><button type="button" class="btn btn-success w-auto"><i class="fa-solid fa-check"></i></button></a>
-                                                    <a title="Reject Article" href="pending_articles.php?target=articles&id=<?= $row['ArticleId']?>&op=reject"><button type="button" class="btn btn-danger w-auto "><i class="fa-solid fa-xmark"></i></button></a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach;?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif ; ?>
+                        <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
 
             </div>
             <!-- /.container-fluid -->
@@ -622,6 +460,7 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
 <script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
 
