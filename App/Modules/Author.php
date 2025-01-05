@@ -48,7 +48,7 @@ class Author extends User{
         }
     }
 
-    public static function GetOwnArticles($id,$isArchived,$status){
+    public static function GetOwnArticles($id,$isArchived){
         $conn = Database::getConnection();
         $sql = "SELECT * ,
         articles.id AS ArticleId, 
@@ -67,7 +67,7 @@ class Author extends User{
             article_tags ON articles.id = article_tags.article_id
         LEFT JOIN
             tags ON article_tags.tag_id = tags.id
-        WHERE articles.isArchived = $isArchived AND articles.author_id = $id AND articles.status = $status
+        WHERE articles.isArchived = $isArchived AND articles.author_id = $id 
         GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at";
         $stmt = $conn->prepare($sql);
         if ($stmt->execute()) {
@@ -78,4 +78,33 @@ class Author extends User{
     }
 
 
+    public static function GetOwnArticleStatus($id , $status){
+        $conn = Database::getConnection();
+        $sql = "SELECT * ,
+        articles.id AS ArticleId, 
+        articles.title AS title, 
+        users.username AS author_name, 
+        categories.name AS category_name, 
+        GROUP_CONCAT(tags.name) AS tags, 
+        articles.views, 
+        articles.created_at
+        FROM articles
+        LEFT JOIN 
+            users ON articles.author_id = users.id
+        LEFT JOIN
+            categories ON articles.category_id = categories.id
+        LEFT JOIN
+            article_tags ON articles.id = article_tags.article_id
+        LEFT JOIN
+            tags ON article_tags.tag_id = tags.id
+        WHERE articles.status = '$status' AND articles.isArchived = 0 AND articles.author_id = $id
+        GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at";
+        $stmt = $conn->prepare($sql);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll();
+        } else {
+            return false;
+        }
+    }
+    
 }

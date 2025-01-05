@@ -1,10 +1,11 @@
 <?php
 require __DIR__."/../../../vendor/autoload.php";
 use App\Controller\articleController;
+use App\Controller\authorController;
 use App\Controller\operationsController;
 use App\Controller\usersController;
 
-$resArticles = articleController::GetPublishedArticle();
+$resArticles = authorController::GetOwnArticles(6);
 if (isset($_GET["id"]) && isset($_GET["op"])){
     operationsController::operation($_GET["id"],$_GET["op"],"articles","id",'Articles.php');
 }
@@ -334,19 +335,15 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                             Articles
                         </h6>
                         <div class="d-flex ">
-                            <a href="Archived.php?target=articles&status=pending">
-                                <h6 class="m-0 bg-warning font-weight-bold text-light p-2 ">
-                                    Pending Articles
-                                </h6>
-                            </a>
-                            <a href="Archived.php?target=articles">
+                            
+                            <a title="add article" href="CreateArticle.php">
                                 <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                    Archived Articles
+                                    <i class="fa-solid fa-plus"></i>
                                 </h6>
                             </a>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <!-- <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
@@ -406,7 +403,24 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                 </tbody>
                             </table>
                         </div>
+                    </div> -->
+
+                    <div style='display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-block:40px;'>
+                        <?php foreach ($resArticles as $ArticleRow): ?>
+                            <div class="card" style="width: 18rem;">
+                                <div style="position:absolute;<?php if($ArticleRow['status'] === "published"){echo "background:green;"; } 
+                                                                elseif($ArticleRow['status'] === "pending"){echo "background:#f6c23e;"; } 
+                                                                elseif($ArticleRow['status'] === "rejected"){echo "background:red;" ;} ?>padding-inline:10px;margin:5px;color:white;border-radius:20px;"><?= $ArticleRow["status"] ?></div>
+                                <img class="card-img-top" src="../../../public/img/undraw_posting_photo.svg" alt="Card image cap">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= $ArticleRow["title"] ?></h5>
+                                    <p style='text-overflow: ellipsis;overflow: hidden; white-space: nowrap;' class="card-text"><?= $ArticleRow["content"] ?></p>
+                                    <a href="#" class="btn btn-primary">More Actions</a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
+                    
                 </div>
 
             </div>

@@ -21,30 +21,30 @@ class authorController{
 
     }
 
-    public static function GetArticles($id)
+    public static function GetOwnArticles($id)
     {
         $Results = Author::GetOwnArticles($id,0,'published');
         return $Results;
     }
 
-    public static function GetArchivedArticles()
+    public static function GetOwnArchivedArticles()
     {
         $Results = CRUD::GetArticles(1);
         return $Results;
     }
 
-    public static function GetPendingArticles()
+    public static function GetOwnPendingArticles()
     {
         $Results = Article::GetArticleStatus('pending');
         return $Results;
     }
     
-    public static function GetPublishedArticle(){
+    public static function GetOwnPublishedArticle(){
         $Results = Article::GetArticleStatus('published');
         return $Results;
     }
 
-    public static function GetRejectedArticle(){
+    public static function GetOwnRejectedArticle(){
         $Results = Article::GetArticleStatus('rejected');
         return $Results;
     }
