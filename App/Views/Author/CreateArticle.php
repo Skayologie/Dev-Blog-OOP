@@ -42,6 +42,7 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
 
     <!-- Custom styles for this page -->
     <link href="../../../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
@@ -343,7 +344,8 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
                         </h6>
 
                     </div>
-                    <form method="POST"  class="w-25">
+                    <div class="w-100 flex justify-center">
+                    <form method="POST"  class="w-50 d-flex flex-col">
                         <div class="mb-3">
                             <label for="exampleInputEmail1"  class="form-label">Title</label>
                             <input name="title" type="text" class="form-control">
@@ -366,13 +368,15 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
                                 <?php endforeach;?>
                             </select>
                         </div>
+                        <div class="flex flex-wrap">
+                            <?php foreach ($resTags as $tagRow): ?>
+                                <div class="form-check form-check-inline">
+                                    <input name="tagsInput[]" class="form-check-input" type="checkbox" id="inlineCheckbox<?= $tagRow['id'] ?>" value="<?= $tagRow['id'] ?>">
+                                    <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name'] ?></label>
+                                </div>
+                            <?php endforeach; ?>
 
-                        <?php foreach ($resTags as $tagRow): ?>
-                            <div class="form-check form-check-inline">
-                                <input name="tagsInput[]" class="form-check-input" type="checkbox" id="inlineCheckbox<?= $tagRow['id'] ?>" value="<?= $tagRow['id'] ?>">
-                                <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name'] ?></label>
-                            </div>
-                        <?php endforeach; ?>
+                        </div>
 
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Author Number :</label>
@@ -394,6 +398,7 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
 
                         <button name="submit" type="submit" class="btn btn-primary">Submit</button>
                     </form>
+                    </div>
                 </div>
 
             </div>
