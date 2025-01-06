@@ -6,8 +6,9 @@ use App\Config\Database;
 use App\Modules\Article;
 use App\Modules\CRUD;
 class articleController{
-    public static function AddArticle($title,$content,$meta,$slug,$cover,$categorieID,$author_id,$tags)
+    public static function AddArticle($title,$content,$meta,$slug,$cover,$categorieID,$tags)
     {
+        $author_id = $_SESSION["UserID"];
         $db = Database::getConnection();
        if(CRUD::Add($db,'articles', ["title","content","slug","featured_image","meta_description","category_id","author_id"],
             [$title,$content,$slug,$cover,$meta,$categorieID,$author_id])){
@@ -15,9 +16,25 @@ class articleController{
             foreach ($tags as $value) {
                 CRUD::Add($db,"article_tags",["article_id","tag_id"],[$lastID,$value]);
             }
-
        }
-
+    }
+    public static function UpdateArticle($id,$title,$content,$meta,$slug,$cover,$categorieID,$author_id,$tags)
+    {
+        $db = Database::getConnection();
+        $data = [
+            "title"=>$title,
+            "content"=> $content,
+            "slug"=> $slug,
+            "featured_image"=> $cover,
+            "meta_description"=> $meta,
+            "category_id"=> $categorieID,
+            "author_id"=> $author_id,
+        ];
+        if(CRUD::Edit($id,'articles', $data)){
+                foreach ($tags as $value) {
+                    CRUD::HardDelete($id,"article_tags","article_id");
+                }
+        }
     }
 
     public static function GetArticles()
@@ -76,6 +93,7 @@ class articleController{
     
         return $string;
     }
+
 }
 
 

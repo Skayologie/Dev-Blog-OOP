@@ -16,4 +16,9 @@ class categoriesController
         CRUD::Add($conn,'categories',['name'],$values);
         header("Location:./Categories.php");
     }
+    public static function GetCategoriesById($id){
+        $conn = Database::getConnection();
+        $results = CRUD::Get($conn , "categories",0,0);
+        return $results;
+    }
 }

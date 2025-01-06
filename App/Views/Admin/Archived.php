@@ -1,10 +1,15 @@
 <?php
+session_start();
 
 use App\Controller\operationsController;
 use App\Controller\usersController;
 use App\Controller\articleController;
+use App\Modules\Session;
 
 require __DIR__."/../../../vendor/autoload.php";
+
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("admin","../index.php");
 
 if (isset($_GET["id"]) && isset($_GET["op"]) && isset($_GET["target"])){
     operationsController::operation($_GET["id"],$_GET["op"],$_GET["target"],"id",'Archived.php?target='.$_GET["target"]);
@@ -69,7 +74,7 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog</div>
+            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
         </a>
 
         <!-- Divider -->

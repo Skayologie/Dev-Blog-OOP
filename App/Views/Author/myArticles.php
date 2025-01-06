@@ -1,15 +1,20 @@
 <?php
-session_start();
 
+require __DIR__."/../../../vendor/autoload.php";
+use App\Controller\articleController;
+use App\Controller\authorController;
 use App\Controller\operationsController;
 use App\Controller\usersController;
 use App\Modules\Session;
-require __DIR__."/../../../vendor/autoload.php";
-Session::checkSessionRole("admin","../index.php");
-
-$resArchived = usersController::GetArchivedUsers();
+session_start();
 Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("author","../index.php");
 
+$userID = $_SESSION["UserID"];
+$resArticles = authorController::GetOwnArticles($userID);
+if (isset($_GET["id"]) && isset($_GET["op"])){
+    operationsController::operation($_GET["id"],$_GET["op"],"articles","id",'Articles.php');
+}
 
 ?>
 <!DOCTYPE html>
@@ -75,29 +80,17 @@ Session::sessionCheck("Logged","../login.php");
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-               aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-cog"></i>
+            <a class="nav-link collapsed" href="../index.php" >
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-link collapsed" href="../Author/myArticles.php" >
+                <i class="fa-solid fa-newspaper"></i>
+                <span>My Articles</span>
+            </a>
+            <a class="nav-link collapsed" href="./" >
                 <span>Management</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Users</h6>
-                    <a class="collapse-item" href="./TableUsers.php">Users</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Articles</h6>
-                    <a class="collapse-item" href="./Articles.php">Articles</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Tags</h6>
-                    <a class="collapse-item" href="../../../Pages/buttons.html">Tags</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Categories</h6>
-                    <a class="collapse-item" href="Categories.php">Categories</a>
-                </div>
-            </div>
         </li>
 
 
@@ -327,58 +320,106 @@ Session::sessionCheck("Logged","../login.php");
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-2 text-gray-800">Manage Users</h1>
+                <h1 class="h3 mb-2 text-gray-800">Manage Articles</h1>
 
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 justify-content-between d-flex">
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                            Users
+                            Articles
                         </h6>
-                        <a href="TableUsers.php">
-                            <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Normal Users
-                            </h6>
-                        </a>
+                        <div class="d-flex ">
+                            
+                            <a title="add article" href="CreateArticle.php">
+                                <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
+                                    <i class="fa-solid fa-plus"></i>
+                                </h6>
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-body">
+                    <!-- <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
+                                    <th>Title</th>
+                                    <th>Views</th>
+                                    <th>Auteur</th>
+                                    <th>Status</th>
+                                    <th>Tags</th>
+                                    <th>categorie</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
                                     <th>Operations</th>
                                 </tr>
                                 </thead>
                                 <tfoot>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
+                                    <th>Title</th>
+                                    <th>Views</th>
+                                    <th>Auteur</th>
+                                    <th>Content</th>
+                                    <th>categorie</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
                                     <th></th>
                                 </tr>
                                 </tfoot>
                                 <tbody>
-                                <?php foreach ($resArchived as $row):?>
-                                    <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach;?>
+                                    <?php foreach ($resArticles as $row):?>
+                                        <tr>
+                                            <td><?= $row['ArticleId']?></td>
+                                            <td><?= $row['title']?></td>
+                                            <td><?= $row['views']?></td>
+                                            <td><?= $row['author_name']?></td>
+                                            <td class="d-flex align-items-center justify-content-center">
+                                                <p  class="text-white px-2 rounded
+                                                <?php
+                                                        if ($row['status'] == "published"){echo "bg-success";}
+                                                        elseif ($row['status'] == "pending"){echo "bg-warning";}
+                                                        else{echo "bg-danger";}?>">
+                                                        <?= $row['status'] ?>
+                                                </p>
+                                            </td>
+                                            <td><?= $row['tags']?></td>
+                                            <td><?= $row['category_name']?></td>
+                                            <td><?= $row['created_at']?></td>
+                                            <td><?= $row['updated_at']?></td>
+
+                                            <td class="flex ">
+                                                <a href="Articles.php?id=<?= $row['ArticleId']?>&op=edit"><button type="button" class="btn btn-info w-auto"><i class="fa-solid fa-pen-to-square"></i></button></a>
+                                                <a href="Articles.php?id=<?= $row['ArticleId']?>&op=archive"><button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-box-archive"></i></button></a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach;?>
                                 </tbody>
                             </table>
                         </div>
+                    </div> -->
+
+                    <div style='display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-block:40px;'>
+                        <?php foreach ($resArticles as $ArticleRow): ?>
+                            <div class="card" style="width: 18rem;">
+                                <div style="position:absolute;<?php if($ArticleRow['status'] === "published"){echo "background:green;"; } 
+                                                                elseif($ArticleRow['status'] === "pending"){echo "background:#f6c23e;"; } 
+                                                                elseif($ArticleRow['status'] === "rejected"){echo "background:red;" ;} ?>padding-inline:10px;margin:5px;color:white;border-radius:20px;"><?= $ArticleRow["status"] ?></div>
+                                <div style="width:100%;height:200px;">
+
+                                    <img style="height: 100%; width:100%;object-fit:cover;" class="card-img-top " src="./../../../public/img/covers/reference<?=$ArticleRow["featured_image"]?>" alt="Card image cap">
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= $ArticleRow["title"] ?></h5>
+                                    <p style='text-overflow: ellipsis;overflow: hidden; white-space: nowrap;' class="card-text"><?= $ArticleRow["content"] ?></p>
+                                    <a href="#" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a href="#" class="btn btn-danger"><i class="fa-solid fa-trash"></i></a>
+                                    <a href="#" class="btn btn-warning"><i class="fa-solid fa-eye"></i></a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
+                    
                 </div>
 
             </div>
@@ -444,7 +485,7 @@ Session::sessionCheck("Logged","../login.php");
 
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
-
+<script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
 </body>
 
 </html>

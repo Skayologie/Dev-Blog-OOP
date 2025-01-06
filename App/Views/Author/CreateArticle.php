@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 use App\Controller\articleController;
 use App\Controller\categoriesController;
@@ -6,15 +7,17 @@ use App\Controller\operationsController;
 use App\Controller\tagsController;
 use App\Controller\usersController;
 use App\Modules\FileHandler;
-
+use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("author","../index.php");
+
 $resUser = usersController::GetUsers();
 $resCategorie = categoriesController::GetCategories();
 $resTags = tagsController::GetTags();
 // 
-if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) && isset($_FILES["coverImage"])){
+if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["meta"]) && isset($_FILES["coverImage"])){
     $categorieID = intval($_POST["categorie"]);
-    $authorID = intval($_POST["author"]);
     $Cover = $_FILES["coverImage"];
     $tags = $_POST["tagsInput"];
     $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
@@ -22,9 +25,8 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
     $path = realpath(__DIR__."/../../../public/img/covers/reference/");
     $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"]);
     
-    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
+    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$tags);
 }
-echo realpath(__DIR__.'/../../vendor/autoload.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -67,7 +69,7 @@ echo realpath(__DIR__.'/../../vendor/autoload.php');
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog</div>
+            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
         </a>
 
         <!-- Divider -->
@@ -77,7 +79,8 @@ echo realpath(__DIR__.'/../../vendor/autoload.php');
         <li class="nav-item active">
             <a class="nav-link" href="../index.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
+                <span>Dashboard</span>
+            </a>
         </li>
 
         <!-- Divider -->
@@ -90,12 +93,19 @@ echo realpath(__DIR__.'/../../vendor/autoload.php');
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+            <a class="nav-link collapsed" href="../index.php" >
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-link collapsed" href="../Author/myArticles.php" >
+                <i class="fa-solid fa-newspaper"></i>
+                <span>My Articles</span>
+            </a>
+            <a class="nav-link collapsed" href="./" >
                 <span>Management</span>
             </a>
-            
-            
         </li>
+        
 
 
 
@@ -377,19 +387,7 @@ echo realpath(__DIR__.'/../../vendor/autoload.php');
 
                         </div>
 
-                        <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Author Number :</label>
-                            <select name="author" class="form-control" aria-describedby="emailHelp" >
-                                <option selected disabled>
-                                    Author Id
-                                </option>
-                                <?php foreach ($resUser as $rowUser): ?>
-                                    <option value="<?php echo $rowUser["id"]; ?>">
-                                        <?php echo $rowUser["username"]; ?>
-                                    </option>
-                                <?php endforeach;?>
-                            </select>
-                        </div>
+                        
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Meta Keyword</label>
                             <input type="text" name="meta" class="form-control" >

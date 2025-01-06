@@ -1,9 +1,12 @@
 <?php
+session_start();
 
 use App\Controller\operationsController;
 use App\Controller\usersController;
-
+use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("admin","../index.php");
 $resUser = usersController::GetUsers();
 
 if (isset($_GET["id"]) && isset($_GET["op"])){
@@ -50,7 +53,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog</div>
+            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
         </a>
 
         <!-- Divider -->

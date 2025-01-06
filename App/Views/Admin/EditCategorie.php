@@ -1,10 +1,15 @@
 <?php
+session_start();
+
 
 use App\Controller\operationsController;
 use App\Controller\usersController;
 use App\Modules\CRUD;
-
+use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("admin","../index.php");
+
 
 if (isset($_GET["id"]) && isset($_GET["op"])){
     $resCategorieById = CRUD::GetById('categories','id',$_GET["id"]);
@@ -65,7 +70,7 @@ if(isset($_POST["CategorieName"]) && isset($_POST["CategorieID"]) ){
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog</div>
+            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
         </a>
 
         <!-- Divider -->

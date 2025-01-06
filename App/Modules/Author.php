@@ -19,9 +19,43 @@ class Author extends User{
     public function Manage_Tags(){
         
     }
-    public function View_Statistics(){
-        
+    public static function totalArticles($id){
+        $conn = Database::getConnection();
+        $sql = "SELECT COUNT(*) AS Total FROM articles WHERE author_id = $id";
+        $stmt = $conn->prepare($sql);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC)[0]["Total"];
+        } else {
+            echo false;
+        }
     }
+    public static function totalViews($id){
+        $conn = Database::getConnection();
+        $sql = "SELECT SUM(views) AS totalViews FROM articles WHERE author_id = $id";
+        $stmt = $conn->prepare($sql);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC)[0]["totalViews"];
+        } else {
+            echo false;
+        }
+    }
+    public static function topArticles($id){
+        $conn = Database::getConnection();
+        $sql = "select * from articles JOIN users ON users.id = articles.author_id WHERE articles.author_id = $id AND status = 'published' AND articles.isArchived = 0  ORDER BY views DESC LIMIT 3";
+        $result = $conn->query($sql);
+        $resultQuery = $result->fetchAll(\PDO::FETCH_ASSOC);
+        return ($resultQuery);
+    }
+    public static function pendingArticles($id){
+        $conn = Database::getConnection();
+        $sql = "select * from articles JOIN users ON users.id = articles.author_id WHERE articles.author_id = $id AND status = 'pending' AND articles.isArchived = 0  ORDER BY created_at DESC";
+        $result = $conn->query($sql);
+        $resultQuery = $result->fetchAll(\PDO::FETCH_ASSOC);
+        return ($resultQuery);
+    }
+
+
+
     public static function archive($id,$table,$col){
         $conn = Database::getConnection();
         $sql = "UPDATE $table SET isArchived = 1 WHERE $col = $id";
@@ -77,7 +111,6 @@ class Author extends User{
         }
     }
 
-
     public static function GetOwnArticleStatus($id , $status){
         $conn = Database::getConnection();
         $sql = "SELECT * ,
@@ -106,5 +139,7 @@ class Author extends User{
             return false;
         }
     }
+
+    
     
 }

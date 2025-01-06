@@ -1,3 +1,24 @@
+<?php
+require __DIR__."/../../vendor/autoload.php";
+
+use App\Modules\User;
+use App\Modules\Session;
+
+session_start();
+if (isset($_POST["email"]) && isset($_POST["password"])) {
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $row = User::login(["email"=>$email,"password"=>$password]);
+    if($row){
+        echo "Logged Successfully";
+        header("Location:./index.php");
+    }
+}
+if (isset($_SESSION["Logged"])) {
+    header("Location:./index.php");
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -41,7 +62,7 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
-                                    <form method="post" action="../../index.php" class="user">
+                                    <form method="post" action="" class="user">
                                         <div class="form-group">
                                             <input name="email" type="email" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"

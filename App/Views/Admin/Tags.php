@@ -1,10 +1,14 @@
 <?php
+session_start();
 
+use App\Modules\Session;
 use App\Config\Database;
 use App\Controller\operationsController;
 use App\Controller\tagsController;
-
 require __DIR__."/../../../vendor/autoload.php";
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("admin","../index.php");
+
 $resTags = tagsController::GetTags();
 
 if (isset($_POST["submit"]) && isset($_POST["tagName"])) {
@@ -56,7 +60,7 @@ if (isset($_GET["op"]) && isset($_GET["id"])) {
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">Dev Blog</div>
+                <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
             </a>
 
             <!-- Divider -->

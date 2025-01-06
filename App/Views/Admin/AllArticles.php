@@ -1,11 +1,17 @@
 <?php
+
 require __DIR__."/../../../vendor/autoload.php";
 use App\Controller\articleController;
 use App\Controller\authorController;
 use App\Controller\operationsController;
 use App\Controller\usersController;
+use App\Modules\Session;
+session_start();
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("admin","../index.php");
 
-$resArticles = authorController::GetOwnArticles(6);
+$userID = $_SESSION["UserID"];
+$resArticles = articleController::GetPendingArticles();
 if (isset($_GET["id"]) && isset($_GET["op"])){
     operationsController::operation($_GET["id"],$_GET["op"],"articles","id",'Articles.php');
 }
@@ -51,7 +57,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog</div>
+            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
         </a>
 
         <!-- Divider -->
@@ -74,29 +80,17 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-               aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-cog"></i>
+            <a class="nav-link collapsed" href="../index.php" >
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-link collapsed" href="../Author/myArticles.php" >
+                <i class="fa-solid fa-newspaper"></i>
+                <span>My Articles</span>
+            </a>
+            <a class="nav-link collapsed" href="./" >
                 <span>Management</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Users</h6>
-                    <a class="collapse-item" href="./TableUsers.php">Users</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Articles</h6>
-                    <a class="collapse-item" href="./Articles.php">Articles</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Tags</h6>
-                    <a class="collapse-item" href="Tags.php">Tags</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Categories</h6>
-                    <a class="collapse-item" href="Categories.php">Categories</a>
-                </div>
-            </div>
         </li>
 
 
@@ -418,7 +412,9 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                 <div class="card-body">
                                     <h5 class="card-title"><?= $ArticleRow["title"] ?></h5>
                                     <p style='text-overflow: ellipsis;overflow: hidden; white-space: nowrap;' class="card-text"><?= $ArticleRow["content"] ?></p>
-                                    <a href="#" class="btn btn-primary">More Actions</a>
+                                    <a href="#" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a href="#" class="btn btn-danger"><i class="fa-solid fa-trash"></i></a>
+                                    <a href="#" class="btn btn-warning"><i class="fa-solid fa-eye"></i></a>
                                 </div>
                             </div>
                         <?php endforeach; ?>

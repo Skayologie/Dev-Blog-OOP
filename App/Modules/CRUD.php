@@ -67,7 +67,7 @@ class CRUD
     
     public static function RejectArticle($id){
         $conn = Database::getConnection();
-        $sql = "UPDATE articles SET status = 'published' WHERE id = $id";
+        $sql = "UPDATE articles SET status = 'rejected' WHERE id = $id";
         $stmt = $conn->prepare($sql);
         return $stmt->execute();
     }
@@ -87,6 +87,15 @@ class CRUD
     public static function Delete($id,$table,$col){
         $conn = Database::getConnection();
         $sql = "UPDATE $table SET isDeleted = 1 WHERE $col = $id";
+        if ($conn->exec($sql)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public static function HardDelete($id,$table,$col){
+        $conn = Database::getConnection();
+        $sql = "DELETE FROM $table WHERE $col = $id ";
         if ($conn->exec($sql)){
             return true;
         }else{

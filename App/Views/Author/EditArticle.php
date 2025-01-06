@@ -1,16 +1,41 @@
 <?php
 session_start();
-
+use App\Controller\articleController;
+use App\Controller\categoriesController;
 use App\Controller\operationsController;
+use App\Controller\tagsController;
 use App\Controller\usersController;
+use App\Modules\CRUD;
+use App\Modules\FileHandler;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
-Session::checkSessionRole("admin","../index.php");
-
-$resArchived = usersController::GetArchivedUsers();
 Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("author","../index.php");
 
+$resUser = usersController::GetUsers();
+$resCategorie = categoriesController::GetCategories();
+$resTags = tagsController::GetTags();
 
+if (isset($_GET["id"])){
+    $resArticleById = CRUD::GetById('Articles','id',$_GET["id"]);
+    $Article = $resArticleById[0];
+    $ArticleCategorie = CRUD::GetById("categories","id",$Article['category_id']);
+    var_dump($ArticleCategorie);
+}
+
+if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) && isset($_FILES["coverImage"])){
+    $categorieID = intval($_POST["categorie"]);
+    $authorID = intval($_POST["author"]);
+    $Cover = $_FILES["coverImage"];
+    $tags = $_POST["tagsInput"];
+    $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    $slug = articleController::create_slug($_POST["title"]);
+    $path = realpath(__DIR__."/../../../public/img/covers/reference/");
+    $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"]);
+    
+    // articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
+    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,14 +53,15 @@ Session::sessionCheck("Logged","../login.php");
     <!-- Custom fonts for this template -->
     <link href="../../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="../../../public/css/sb-admin-2.min.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
     <link href="../../../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
@@ -62,7 +88,8 @@ Session::sessionCheck("Logged","../login.php");
         <li class="nav-item active">
             <a class="nav-link" href="../index.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
+                <span>Dashboard</span>
+            </a>
         </li>
 
         <!-- Divider -->
@@ -74,31 +101,21 @@ Session::sessionCheck("Logged","../login.php");
         </div>
 
         <!-- Nav Item - Pages Collapse Menu -->
+        <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-               aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-cog"></i>
+            <a class="nav-link collapsed" href="../index.php" >
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-link collapsed" href="../Author/myArticles.php" >
+                <i class="fa-solid fa-newspaper"></i>
+                <span>My Articles</span>
+            </a>
+            <a class="nav-link collapsed" href="./" >
                 <span>Management</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Users</h6>
-                    <a class="collapse-item" href="./TableUsers.php">Users</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Articles</h6>
-                    <a class="collapse-item" href="./Articles.php">Articles</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Tags</h6>
-                    <a class="collapse-item" href="../../../Pages/buttons.html">Tags</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Categories</h6>
-                    <a class="collapse-item" href="Categories.php">Categories</a>
-                </div>
-            </div>
         </li>
+        
 
 
 
@@ -129,7 +146,7 @@ Session::sessionCheck("Logged","../login.php");
 
                 <!-- Topbar Search -->
                 <form
-                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
                         <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
                                aria-label="Search" aria-describedby="basic-addon2">
@@ -333,51 +350,73 @@ Session::sessionCheck("Logged","../login.php");
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 justify-content-between d-flex">
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                            Users
+                            Add Article
                         </h6>
-                        <a href="TableUsers.php">
-                            <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Normal Users
-                            </h6>
-                        </a>
+
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th>Operations</th>
-                                </tr>
-                                </thead>
-                                <tfoot>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th></th>
-                                </tr>
-                                </tfoot>
-                                <tbody>
-                                <?php foreach ($resArchived as $row):?>
-                                    <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach;?>
-                                </tbody>
-                            </table>
+                    <div class="w-100 flex justify-center">
+                    <form method="POST"  class="w-50 d-flex flex-col"  enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1"  class="form-label">Title</label>
+                            <input name="title" type="text" value="<?= $Article["title"] ?>" class="form-control">
                         </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Content</label>
+                            <textarea name="content" class="form-control" aria-describedby="emailHelp"><?= $Article["content"] ?></textarea>
+
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Upload Cover</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="coverImage" id="inputGroupFile01">
+                                <label class="custom-file-label" for="inputGroupFile01">Choose Image</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Categories</label>
+                            <select name="categorie" value="<?php echo $Article["category_id"]; ?>" class="form-control" aria-describedby="emailHelp" >
+                                <option selected disabled>
+                                    Choose Categorie
+                                </option>
+                                <?php foreach ($resCategorie as $rowUser): ?>
+                                    <option value="<?php echo $Article["content"]; ?>">
+                                        <?php echo $rowUser["name"]; ?>
+                                    </option>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
+                        <div class="flex flex-wrap">
+                            <?php foreach ($resTags as $tagRow): ?>
+                                <div class="form-check form-check-inline">
+                                    <input name="tagsInput[]" class="form-check-input" type="checkbox" id="inlineCheckbox<?= $tagRow['id'] ?>" value="<?= $tagRow['id'] ?>">
+                                    <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name'] ?></label>
+                                </div>
+                            <?php endforeach; ?>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Author Number :</label>
+                            <select name="author" class="form-control" aria-describedby="emailHelp" >
+                                <option selected disabled>
+                                    Author Id
+                                </option>
+                                <?php foreach ($resUser as $rowUser): ?>
+                                    <option value="<?php echo $rowUser["id"]; ?>">
+                                        <?php echo $rowUser["username"]; ?>
+                                    </option>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Meta Keyword</label>
+                            <input type="text" name="meta" class="form-control" >
+                        </div>
+
+                        <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+                    </form>
                     </div>
                 </div>
 
@@ -444,6 +483,8 @@ Session::sessionCheck("Logged","../login.php");
 
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
+<script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
 

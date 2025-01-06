@@ -5,8 +5,12 @@ use App\Controller\categoriesController;
 use App\Controller\operationsController;
 use App\Controller\tagsController;
 use App\Controller\usersController;
-
+session_start();
+use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
+Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole("author","../index.php");
+
 $resUser = usersController::GetUsers();
 $resCategorie = categoriesController::GetCategories();
 $resTags = tagsController::GetTags();
@@ -15,7 +19,7 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
     $categorieID = intval($_POST["categorie"]);
     $authorID = intval($_POST["author"]);
     $tags = $_POST["tagsInput"];
-    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$categorieID,$authorID,$tags);
+    // articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$categorieID,$authorID,$tags);
 }
 ?>
 <!DOCTYPE html>
@@ -58,7 +62,7 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog</div>
+            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
         </a>
 
         <!-- Divider -->
