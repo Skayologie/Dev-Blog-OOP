@@ -1,12 +1,17 @@
 <?php
 use App\Controller\categoriesController;
 use App\Controller\operationsController;
+use App\Modules\CRUD;
 
 require __DIR__."/../../../vendor/autoload.php";
 $resCategories = categoriesController::GetCategories();
 if (isset($_GET["id"]) && isset($_GET["op"])){
     operationsController::operation($_GET["id"],$_GET["op"],"categories","id",'Categories.php');
 }
+if (isset($_POST["submit"]) && isset($_POST["CategorieName"])) {
+    categoriesController::AddCategorie([$_POST["CategorieName"]]);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -325,13 +330,22 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Manage Tags</h1>
-
+                    <h1 class="h3 mb-2 text-gray-800">Manage Categories</h1>
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label  class="form-label">Categorie</label>
+                            <div class="d-flex w-50">
+                                <input type="text" name="CategorieName" class="form-control">
+                                <button name="submit" type="submit" class=" w-50 btn btn-primary ml-2">Add Categorie</button>
+                            </div>
+                        </div>
+                        
+                    </form>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Tags</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Categories</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">

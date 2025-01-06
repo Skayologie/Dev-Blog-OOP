@@ -1,8 +1,19 @@
 <?php
+
+use App\Config\Database;
+use App\Controller\operationsController;
 use App\Controller\tagsController;
 
 require __DIR__."/../../../vendor/autoload.php";
 $resTags = tagsController::GetTags();
+
+if (isset($_POST["submit"]) && isset($_POST["tagName"])) {
+    tagsController::AddTag([$_POST["tagName"]]);
+    echo $_POST["tagName"];
+}
+if (isset($_GET["op"]) && isset($_GET["id"])) {
+    operationsController::operation($_GET["id"],$_GET["op"],'tags','id','./Tags.php');
+}
 ?>
 
 <!DOCTYPE html>
@@ -322,7 +333,16 @@ $resTags = tagsController::GetTags();
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Manage Tags</h1>
 
-
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label  class="form-label">Tag</label>
+                            <div class="d-flex w-50">
+                            <input type="text" name="tagName" class="form-control">
+                            <button name="submit" type="submit" class=" w-50 btn btn-primary ml-2">Add Tag</button>
+                            </div>
+                        </div>
+                        
+                    </form>
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -352,8 +372,7 @@ $resTags = tagsController::GetTags();
                                             <td><?= $row['id']?></td>
                                             <td><?= $row['name']?></td>
                                             <td>
-                                                <button type="button" class="btn btn-danger">Delete</button>
-                                                <button type="button" class="btn btn-info">Edit</button>
+                                                <a href="Tags.php?op=Delete&id=<?= $row['id']?>"><button type="button" class="btn btn-danger">Delete</button></a>
                                             </td>
                                         </tr>
                                     <?php endforeach ;?>

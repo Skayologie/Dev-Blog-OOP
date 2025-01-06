@@ -29,7 +29,7 @@ class CRUD
         }
     }
 
-    public static function GetArticles($isArchived){
+    public static function GetArticles($isArchived,$isDeleted){
         $conn = Database::getConnection();
         $sql = "SELECT * ,
         articles.id AS ArticleId, 
@@ -48,7 +48,7 @@ class CRUD
             article_tags ON articles.id = article_tags.article_id
         LEFT JOIN
             tags ON article_tags.tag_id = tags.id
-        WHERE articles.isArchived = $isArchived 
+        WHERE articles.isArchived = $isArchived AND articles.isDeleted = $isDeleted
         GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at";
         $stmt = $conn->prepare($sql);
         if ($stmt->execute()) {

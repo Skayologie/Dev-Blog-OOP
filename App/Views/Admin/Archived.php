@@ -468,7 +468,7 @@ if (isset($_GET["target"]) && !isset($_GET["status"])){
                                                 <td><?= $row['updated_at']?></td>
 
                                                 <td class="flex ">
-                                                    <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=delete"><button type="button" class="btn btn-danger w-auto"><i class="fa-solid fa-trash"></i></button></a>
+                                                    <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=Delete"><button type="button" class="btn btn-danger w-auto"><i class="fa-solid fa-trash"></i></button></a>
                                                     <a href="Archived.php?target=articles&id=<?= $row['ArticleId']?>&op=restore"><button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-arrow-up-from-bracket"></i></button></a>
                                                 </td>
                                             </tr>

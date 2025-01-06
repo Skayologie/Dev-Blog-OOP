@@ -30,6 +30,28 @@ class Stats{
         $resultQuery = $result->fetchAll(PDO::FETCH_ASSOC);
         return ($resultQuery);
     }
+    public static function get_top_users(){
+        $conn = Database::getConnection();
+        $sql = "SELECT 
+        users.id,profile_picture_url, username, 
+        COUNT(articles.id) AS article_count, 
+        SUM(articles.views) AS viewsAll 
+        FROM articles 
+        JOIN users ON users.id = articles.author_id 
+        GROUP BY users.id 
+        ORDER BY viewsAll DESC 
+        LIMIT 3";
+        $result = $conn->query($sql);
+        $resultQuery = $result->fetchAll(PDO::FETCH_ASSOC);
+        return ($resultQuery);
+    }
+    public static function get_top_articles(){
+        $conn = Database::getConnection();
+        $sql = "select * from articles JOIN users ON users.id = articles.author_id ORDER BY views DESC LIMIT 3";
+        $result = $conn->query($sql);
+        $resultQuery = $result->fetchAll(PDO::FETCH_ASSOC);
+        return ($resultQuery);
+    }
 }
 $TotalUsers = Stats::Total("users");
 $TotalArticles = Stats::Total("articles");

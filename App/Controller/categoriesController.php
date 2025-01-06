@@ -11,4 +11,9 @@ class categoriesController
         $results = CRUD::Get($conn , "categories",0,0);
         return $results;
     }
+    public static function AddCategorie($values){
+        $conn = Database::getConnection();
+        CRUD::Add($conn,'categories',['name'],$values);
+        header("Location:./Categories.php");
+    }
 }

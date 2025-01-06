@@ -22,13 +22,13 @@ class articleController{
 
     public static function GetArticles()
     {
-        $Results = CRUD::GetArticles(0);
+        $Results = CRUD::GetArticles(0,0);
         return $Results;
     }
 
     public static function GetArchivedArticles()
     {
-        $Results = CRUD::GetArticles(1);
+        $Results = CRUD::GetArticles(1,0);
         return $Results;
     }
 

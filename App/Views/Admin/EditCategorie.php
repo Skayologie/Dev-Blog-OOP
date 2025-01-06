@@ -9,21 +9,16 @@ require __DIR__."/../../../vendor/autoload.php";
 if (isset($_GET["id"]) && isset($_GET["op"])){
     $resCategorieById = CRUD::GetById('categories','id',$_GET["id"]);
     $Categorie = $resCategorieById[0];
-    var_dump($Categorie);
 }
 if(isset($_POST["CategorieName"]) && isset($_POST["CategorieID"]) ){
-    $id = $_POST["id"];
-    $username = $_POST["username"];
-    $email = $_POST["email"];
-    $bio = $_POST["bio"];
+    $id = $_POST["CategorieID"];
+    $NewCategorie = $_POST["CategorieName"];
     $data = array(
-        "username"=>$username,
-        "email"=>$email,
-        "bio"=>$bio,
+        "name"=>$NewCategorie,
     );
-    $result = CRUD::Edit($id,'users',$data);
+    $result = CRUD::Edit($id,'categories',$data);
     if ($result){
-        header("Location: TableUsers.php");
+        header("Location: Categories.php");
     }else{
         header("Location: EditCategorie.php");
     }
