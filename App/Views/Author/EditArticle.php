@@ -19,23 +19,36 @@ $resTags = tagsController::GetTags();
 if (isset($_GET["id"])){
     $resArticleById = CRUD::GetById('Articles','id',$_GET["id"]);
     $Article = $resArticleById[0];
-    $ArticleCategorie = CRUD::GetById("categories","id",$Article['category_id']);
-    var_dump($ArticleCategorie);
+    print_r($Article) ;
+    $ArticleCategorie = CRUD::GetById("categories","id",$Article['category_id'])[0];
+    $tags = CRUD::GetById('article_tags','article_id',$_GET["id"]);
+    $checkedTags = array_column($tags, 'tag_id');
 }
 
-if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) && isset($_FILES["coverImage"])){
+if (isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) ){
+    if (!isset($_FILES["coverImage"])) {
+        $Cover = $_POST["coverImage"];
+        $result = ["filename"=>$Cover];
+    }else{
+        $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        $Cover = $_FILES["coverImage"];
+        $path = realpath(__DIR__."/../../../public/img/covers/reference/");
+        $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"]);
+    }
+        
     $categorieID = intval($_POST["categorie"]);
-    $authorID = intval($_POST["author"]);
-    $Cover = $_FILES["coverImage"];
+    $authorID = $_SESSION["UserID"];
     $tags = $_POST["tagsInput"];
-    $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     $slug = articleController::create_slug($_POST["title"]);
-    $path = realpath(__DIR__."/../../../public/img/covers/reference/");
-    $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"]);
-    
-    // articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
-    articleController::AddArticle($_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
+    articleController::UpdateArticle(intval($_POST["articleid"]),$_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
+// articleController::UpdateArticle(46,'This is Just Pure Practice',"DDDD"," "," SMAPP"," ",3,6,$tags);
+// articleController::UpdateArticle(46,'This is Just Pure Practice',"saaaaaa"," "," SMAPP"," ",3,6,$tags);
+
+}else{
+    print_r($_POST);
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -355,7 +368,22 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
 
                     </div>
                     <div class="w-100 flex justify-center">
-                    <form method="POST"  class="w-50 d-flex flex-col"  enctype="multipart/form-data">
+                    <form method="post" action="EditArticle.php?op=Edit&id=<?=$_GET["id"]?>" class="w-50 d-flex flex-col"  enctype="multipart/form-data">
+                        <input type="hidden" name="articleid" value="<?=$_GET["id"]?>">    
+                    <div class="mb-4">
+                            <div class="h-[200px] w-[100%] mb-3 mt-3 overflow-hidden border rounded-[10px]">
+                                <img style="object-fit:cover;width:100%;height:100%;" src="../../../public/img/covers/reference<?= $Article["featured_image"] ?>" alt="">
+                            </div>
+                            <div class="input-group mb-3 h-[10px]">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Upload Cover</span>
+                                </div>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="coverImage" id="inputGroupFile01">
+                                    <label class="custom-file-label" for="inputGroupFile01">Choose Image</label>
+                                </div>
+                            </div>
+                        </div>    
                         <div class="mb-3">
                             <label for="exampleInputEmail1"  class="form-label">Title</label>
                             <input name="title" type="text" value="<?= $Article["title"] ?>" class="form-control">
@@ -365,54 +393,39 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
                             <textarea name="content" class="form-control" aria-describedby="emailHelp"><?= $Article["content"] ?></textarea>
 
                         </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Upload Cover</span>
-                            </div>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" name="coverImage" id="inputGroupFile01">
-                                <label class="custom-file-label" for="inputGroupFile01">Choose Image</label>
-                            </div>
-                        </div>
+                        
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Categories</label>
                             <select name="categorie" value="<?php echo $Article["category_id"]; ?>" class="form-control" aria-describedby="emailHelp" >
-                                <option selected disabled>
+                                <option disabled>
                                     Choose Categorie
                                 </option>
+                                <option value="<?php echo $Article["category_id"]; ?>" selected >
+                                    <?= $ArticleCategorie['name']; ?>
+                                </option>
                                 <?php foreach ($resCategorie as $rowUser): ?>
-                                    <option value="<?php echo $Article["content"]; ?>">
+                                    <option value="<?php echo $rowUser["id"]; ?>">
                                         <?php echo $rowUser["name"]; ?>
                                     </option>
                                 <?php endforeach;?>
                             </select>
                         </div>
                         <div class="flex flex-wrap">
-                            <?php foreach ($resTags as $tagRow): ?>
-                                <div class="form-check form-check-inline">
-                                    <input name="tagsInput[]" class="form-check-input" type="checkbox" id="inlineCheckbox<?= $tagRow['id'] ?>" value="<?= $tagRow['id'] ?>">
-                                    <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name'] ?></label>
-                                </div>
-                            <?php endforeach; ?>
+                                <?php foreach ($resTags as $tagRow): 
+                                    $isChecked = in_array($tagRow['id'], $checkedTags); ?>
+                                        <div class="form-check form-check-inline">
+                                                <input name="tagsInput[]" class="form-check-input" <?php echo $isChecked ? 'checked' : ''; ?> type="checkbox" id="inlineCheckbox<?= $tagRow['id']?>" value="<?= $tagRow['id'] ?> ">
+                                                <label class="form-check-label" for="inlineCheckbox<?= $tagRow['id'] ?>"><?= $tagRow['name']  ?></label>
+                                        </div>
+                                        
+                                <?php endforeach; ?>
 
                         </div>
 
-                        <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Author Number :</label>
-                            <select name="author" class="form-control" aria-describedby="emailHelp" >
-                                <option selected disabled>
-                                    Author Id
-                                </option>
-                                <?php foreach ($resUser as $rowUser): ?>
-                                    <option value="<?php echo $rowUser["id"]; ?>">
-                                        <?php echo $rowUser["username"]; ?>
-                                    </option>
-                                <?php endforeach;?>
-                            </select>
-                        </div>
+                       
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Meta Keyword</label>
-                            <input type="text" name="meta" class="form-control" >
+                            <input type="text" value="<?=$Article["meta_description"]?>" name="meta" class="form-control" >
                         </div>
 
                         <button name="submit" type="submit" class="btn btn-primary">Submit</button>

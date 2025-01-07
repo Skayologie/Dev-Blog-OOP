@@ -58,6 +58,35 @@ class CRUD
         }
     }
 
+
+    public static function GetArticlesByID($isArchived,$isDeleted,$id){
+        $conn = Database::getConnection();
+        $sql = "SELECT * ,
+        articles.id AS ArticleId, 
+        articles.title AS title, 
+        users.username AS author_name, 
+        categories.name AS category_name, 
+        GROUP_CONCAT(tags.name) AS tags, 
+        articles.views, 
+        articles.created_at
+        FROM articles
+        LEFT JOIN 
+            users ON articles.author_id = users.id
+        LEFT JOIN
+            categories ON articles.category_id = categories.id
+        LEFT JOIN
+            article_tags ON articles.id = article_tags.article_id
+        LEFT JOIN
+            tags ON article_tags.tag_id = tags.id
+        WHERE articles.isArchived = $isArchived AND articles.isDeleted = $isDeleted AND articles.id = $id
+        GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at";
+        $stmt = $conn->prepare($sql);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll();
+        } else {
+            return false;
+        }
+    }
     public static function AcceptArticle($id){
         $conn = Database::getConnection();
         $sql = "UPDATE articles SET status = 'published' WHERE id = $id";
@@ -95,8 +124,10 @@ class CRUD
     }
     public static function HardDelete($id,$table,$col){
         $conn = Database::getConnection();
-        $sql = "DELETE FROM $table WHERE $col = $id ";
-        if ($conn->exec($sql)){
+        $sql = "DELETE FROM $table WHERE $col = ? ";
+        $sql = "DELETE FROM $table WHERE $col = ? AND col = ?";
+        $stmt= $conn->prepare($sql);
+        if ($stmt->execute([$id])){
             return true;
         }else{
             return false;

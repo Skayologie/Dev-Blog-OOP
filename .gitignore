@@ -7,3 +7,4 @@ vendor
 !.env.vault
 index.php
 .idea
+public/img/covers

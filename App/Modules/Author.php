@@ -41,7 +41,7 @@ class Author extends User{
     }
     public static function topArticles($id){
         $conn = Database::getConnection();
-        $sql = "select * from articles JOIN users ON users.id = articles.author_id WHERE articles.author_id = $id AND status = 'published' AND articles.isArchived = 0  ORDER BY views DESC LIMIT 3";
+        $sql = "select * ,articles.id AS ArticleID  from articles JOIN users ON users.id = articles.author_id WHERE articles.author_id = $id AND status = 'published' AND articles.isArchived = 0  ORDER BY views DESC LIMIT 3";
         $result = $conn->query($sql);
         $resultQuery = $result->fetchAll(\PDO::FETCH_ASSOC);
         return ($resultQuery);

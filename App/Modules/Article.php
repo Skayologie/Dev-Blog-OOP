@@ -36,5 +36,14 @@ class article
             return false;
         }
     }
+    public static function incViews($idArticle){
+        $conn = Database::getConnection();
+        $query = "UPDATE articles 
+                  SET views = CASE WHEN views IS NOT NULL THEN views + 1 ELSE 1 END 
+                  WHERE id = :id";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':id', $idArticle, PDO::PARAM_STR);
+        $stmt->execute();
+    }
 }
 

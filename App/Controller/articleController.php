@@ -5,6 +5,8 @@ require realpath(__DIR__."/../../vendor/autoload.php");
 use App\Config\Database;
 use App\Modules\Article;
 use App\Modules\CRUD;
+use App\Modules\Tag;
+
 class articleController{
     public static function AddArticle($title,$content,$meta,$slug,$cover,$categorieID,$tags)
     {
@@ -20,7 +22,6 @@ class articleController{
     }
     public static function UpdateArticle($id,$title,$content,$meta,$slug,$cover,$categorieID,$author_id,$tags)
     {
-        $db = Database::getConnection();
         $data = [
             "title"=>$title,
             "content"=> $content,
@@ -30,9 +31,12 @@ class articleController{
             "category_id"=> $categorieID,
             "author_id"=> $author_id,
         ];
-        if(CRUD::Edit($id,'articles', $data)){
+        if(CRUD::Edit(intval($id),'articles', $data)){
                 foreach ($tags as $value) {
-                    CRUD::HardDelete($id,"article_tags","article_id");
+                    $resu = Tag::HardDeleteTag(intval($id),$value);
+                    if ($resu) {
+                        echo "Done";
+                    }
                 }
         }
     }
@@ -42,7 +46,11 @@ class articleController{
         $Results = CRUD::GetArticles(0,0);
         return $Results;
     }
-
+    public static function GetArticleByID($id)
+    {
+        $Results = CRUD::GetById("articles","id",$id);
+        return $Results;
+    }
     public static function GetArchivedArticles()
     {
         $Results = CRUD::GetArticles(1,0);
@@ -94,8 +102,7 @@ class articleController{
         return $string;
     }
 
+    
 }
-
-
 
 

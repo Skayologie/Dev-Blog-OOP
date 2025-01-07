@@ -14,6 +14,7 @@ $userID = $_SESSION["UserID"];
 $resArticles = authorController::GetOwnArticles($userID);
 if (isset($_GET["id"]) && isset($_GET["op"])){
     operationsController::operation($_GET["id"],$_GET["op"],"articles","id",'Articles.php');
+    
 }
 
 ?>
@@ -412,7 +413,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                 <div class="card-body">
                                     <h5 class="card-title"><?= $ArticleRow["title"] ?></h5>
                                     <p style='text-overflow: ellipsis;overflow: hidden; white-space: nowrap;' class="card-text"><?= $ArticleRow["content"] ?></p>
-                                    <a href="#" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a href="./EditArticle.php?id=<?=$ArticleRow["ArticleId"]?>" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <a href="#" class="btn btn-danger"><i class="fa-solid fa-trash"></i></a>
                                     <a href="#" class="btn btn-warning"><i class="fa-solid fa-eye"></i></a>
                                 </div>
