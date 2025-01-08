@@ -22,3 +22,4 @@ if (isset($routes[$url])) {
     http_response_code(404);
     echo "Route not found.";
 }
+header("Location:/App/Views/");
