@@ -28,7 +28,8 @@ class article
         LEFT JOIN
             tags ON article_tags.tag_id = tags.id
         WHERE articles.status = '$status' AND articles.isArchived = 0
-        GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at";
+        GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at
+        ORDER BY articles.created_at DESC";
         $stmt = $conn->prepare($sql);
         if ($stmt->execute()) {
             return $stmt->fetchAll();

@@ -41,8 +41,6 @@ if (isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categori
     $tags = $_POST["tagsInput"];
     $slug = articleController::create_slug($_POST["title"]);
     articleController::UpdateArticle(intval($_POST["articleid"]),$_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
-// articleController::UpdateArticle(46,'This is Just Pure Practice',"DDDD"," "," SMAPP"," ",3,6,$tags);
-// articleController::UpdateArticle(46,'This is Just Pure Practice',"saaaaaa"," "," SMAPP"," ",3,6,$tags);
 
 }else{
     print_r($_POST);

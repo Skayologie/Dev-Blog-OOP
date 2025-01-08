@@ -57,6 +57,14 @@ class Admin extends User{
             return false;
         }
     }
+    public static function getRoles(){
+        $conn = Database::getConnection();
+        $sql = "SELECT role FROM users GROUP BY role";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $results;
+    }
 
 
 }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Modules;
 use App\config\Database;
+use App\Controller\usersController;
 use PDO;
 require realpath(__DIR__ . "/../../vendor/autoload.php");
 
@@ -34,6 +35,7 @@ class User{
                 $_SESSION["Logged"] = "Logged";
                 $_SESSION["UserID"] = $result["id"];
                 $_SESSION["UserName"] = $result["username"];
+                $_SESSION["ProfilePic"] = $result["profile_picture_url"];
                 $_SESSION["UserRole"] = $result["role"];
                 return true;
             }else{
@@ -45,8 +47,21 @@ class User{
         
     }
     
-    public function register($name , $email,$password,$role="Normal_user"){
-        
+    public static function register($username , $email,$password,$bio,$profile,$role="Normal_user"){
+        if( self::validate_email($email) &&
+            self::validate_password($password) && 
+            self::validate_username($username)){
+                $res = usersController::addUser($username,$email,$password,$bio,$profile);
+                if ($res) {
+                    header("Location:./login.php");
+                    return "Registered Successfully";
+                }else{
+                    header("Location:./login.php");
+                    return "Registered Failed";
+                }
+        }else{
+            return "Check Your Informations";
+        }
     }
     public function updateProfile($id){
         
@@ -54,5 +69,18 @@ class User{
     public static function logout(){
         session_destroy();
     }
-
+    public static function validate_email($email) {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+    public static function validate_password($password) {
+        // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
+        return strlen($password) >= 8 &&
+               preg_match('/[A-Z]/', $password) &&
+               preg_match('/[a-z]/', $password) &&
+               preg_match('/[0-9]/', $password);
+    }
+    public static function validate_username($username) {
+        // 3-20 characters, letters, numbers, underscores
+        return preg_match('/^[a-zA-Z0-9_]{3,20}$/', $username);
+    }
 }

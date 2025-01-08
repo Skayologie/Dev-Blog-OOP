@@ -351,6 +351,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Bio</th>
+                                    <th>Role</th>
                                     <th>Operations</th>
                                 </tr>
                                 </thead>
@@ -360,6 +361,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Bio</th>
+                                    <th>Role</th>
                                     <th></th>
                                 </tr>
                                 </tfoot>
@@ -370,6 +372,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                             <td><?= $row['username']?></td>
                                             <td><?= $row['email']?></td>
                                             <td><?= $row['bio']?></td>
+                                            <td><?= $row['role']?></td>
                                             <td>
                                                 <a href="Edit.php?id=<?= $row['id']?>"><button type="button" class="btn btn-info"><i class="fa-solid fa-pen-to-square"></i></button></a>
                                                 <a href="TableUsers.php?id=<?= $row['id']?>&op=archive"><button type="button" class="btn btn-danger"><i class="fa-solid fa-ban"></i></button></a>

@@ -4,26 +4,28 @@ session_start();
 
 use App\Controller\operationsController;
 use App\Controller\usersController;
+use App\Modules\Admin;
 use App\Modules\CRUD;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
 Session::sessionCheck("Logged","../login.php");
 Session::checkSessionRole("admin","../index.php");
-
-
+$roles = Admin::getRoles();
 if (isset($_GET["id"])){
     $resUserById = CRUD::GetById('users','id',$_GET["id"]);
     $user = $resUserById[0];
 }
-if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"])){
+if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"]) || isset($_POST["role"])){
     $id = $_POST["id"];
     $username = $_POST["username"];
     $email = $_POST["email"];
     $bio = $_POST["bio"];
+    $role = $_POST["role"];
     $data = array(
         "username"=>$username,
         "email"=>$email,
         "bio"=>$bio,
+        "role"=>$role,
     );
 
     $result = CRUD::Edit($id,'users',$data);
@@ -55,6 +57,8 @@ if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"])){
         rel="stylesheet">
 
     <!-- Custom styles for this template -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     <link href="../../../public/css/sb-admin-2.min.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
@@ -361,6 +365,15 @@ if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"])){
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email</label>
                         <input type="Email" name="email" class="form-control"  value="<?= $user['email']?>" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Role</label>
+                        <select name="role" value="<?= $user['role']?>" class="form-select" aria-label="Default select example">
+                            <option selected value="<?= $user['role']?>"><?= $user['role']?></option>
+                            <?php foreach($roles as $role): ?>
+                                <option value="<?=$role["role"]?>"><?=$role["role"]?></option>
+                            <?php endforeach; ?>    
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Bio</label>

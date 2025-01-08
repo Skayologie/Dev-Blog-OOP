@@ -10,7 +10,7 @@ use App\Modules\CRUD;
 use App\Modules\Session;
 session_start();
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole("admin","../index.php");
+Session::checkSessionRole([""=>"admin",""=>"user"],"../index.php");
 
 $userID = $_SESSION["UserID"];
 if (isset($_GET["id"])) {
@@ -384,7 +384,10 @@ function nicetime($date)
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
+                <a class="dropdown-item" href="../logout.php" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Logout
+                </a>
             </div>
         </div>
     </div>
