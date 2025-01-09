@@ -21,10 +21,10 @@ class User{
         $email = $data['email'];
         $password = $data['password'];
 
-        $sql = "SELECT * FROM users WHERE email = :email AND password_hash = :password";
+        $sql = "SELECT * FROM users WHERE email = :email";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+        // $stmt->bindParam(':password', $password, PDO::PARAM_STR);
 
         $stmt->execute();
 
@@ -32,12 +32,14 @@ class User{
 
         if ($result) {
             if ($stmt->rowCount() > 0) {
-                $_SESSION["Logged"] = "Logged";
-                $_SESSION["UserID"] = $result["id"];
-                $_SESSION["UserName"] = $result["username"];
-                $_SESSION["ProfilePic"] = $result["profile_picture_url"];
-                $_SESSION["UserRole"] = $result["role"];
-                return true;
+                if(password_verify($password,$result["password_hash"])){
+                    $_SESSION["Logged"] = "Logged";
+                    $_SESSION["UserID"] = $result["id"];
+                    $_SESSION["UserName"] = $result["username"];
+                    $_SESSION["ProfilePic"] = $result["profile_picture_url"];
+                    $_SESSION["UserRole"] = $result["role"];
+                    return true;
+                }
             }else{
                 return false;
             }
@@ -51,6 +53,7 @@ class User{
         if( self::validate_email($email) &&
             self::validate_password($password) && 
             self::validate_username($username)){
+                
                 $res = usersController::addUser($username,$email,$password,$bio,$profile);
                 if ($res) {
                     header("Location:./login.php");

@@ -10,7 +10,7 @@ use App\Modules\FileHandler;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole(["author"],"../index.php");
+// Session::checkSessionRole(["author"],"../index.php");
 
 
 $resUser = usersController::GetUsers();
@@ -20,7 +20,6 @@ $resTags = tagsController::GetTags();
 if (isset($_GET["id"])){
     $resUserById = CRUD::GetById('users','id',$_GET["id"]);
     $User = $resUserById[0];
-    print_r($User);  
 }else{
     header("Location:../index.php");
 }
@@ -76,64 +75,65 @@ if (isset($_POST["submit"]) && isset($_POST["email"]) && !empty($_POST["email"])
 
 <!-- Page Wrapper -->
 <div id="wrapper">
+    <?php if(isset($_SESSION["UserRole"]) && $_SESSION["UserRole"] != "user"): ?>
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-    <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
+            </a>
 
-        <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
-            <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-laugh-wink"></i>
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="../index.php">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Interface
             </div>
-            <div class="sidebar-brand-text mx-3">Dev Blog <?php echo $_SESSION["UserRole"];?></div>
-        </a>
 
-        <!-- Divider -->
-        <hr class="sidebar-divider my-0">
-
-        <!-- Nav Item - Dashboard -->
-        <li class="nav-item active">
-            <a class="nav-link" href="../index.php">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-
-        <!-- Divider -->
-        <hr class="sidebar-divider">
-
-        <!-- Heading -->
-        <div class="sidebar-heading">
-            Interface
-        </div>
-
-        <!-- Nav Item - Pages Collapse Menu -->
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="../index.php" >
-                <i class="fa-solid fa-house"></i>
-                <span>Home</span>
-            </a>
-            <a class="nav-link collapsed" href="../Author/myArticles.php" >
-                <i class="fa-solid fa-newspaper"></i>
-                <span>My Articles</span>
-            </a>
-            <a class="nav-link collapsed" href="./" >
-                <span>Management</span>
-            </a>
-        </li>
-        
+            <!-- Nav Item - Pages Collapse Menu -->
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="../index.php" >
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                <a class="nav-link collapsed" href="../Author/myArticles.php" >
+                    <i class="fa-solid fa-newspaper"></i>
+                    <span>My Articles</span>
+                </a>
+                <a class="nav-link collapsed" href="./" >
+                    <span>Management</span>
+                </a>
+            </li>
+            
 
 
 
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
 
 
-    </ul>
-    <!-- End of Sidebar -->
+        </ul>
+        <!-- End of Sidebar -->
+    <?php endif; ?>
 
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
@@ -151,19 +151,7 @@ if (isset($_POST["submit"]) && isset($_POST["email"]) && !empty($_POST["email"])
                     </button>
                 </form>
 
-                <!-- Topbar Search -->
-                <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                    <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                               aria-label="Search" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-search fa-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                
 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
@@ -194,120 +182,13 @@ if (isset($_POST["submit"]) && isset($_POST["email"]) && !empty($_POST["email"])
 
                     <!-- Nav Item - Alerts -->
                     <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-bell fa-fw"></i>
+                        <a class="nav-link dropdown-toggle" href="./index.php" id="alertsDropdown">
+                            <i class="fa-solid fa-house"></i>
                             <!-- Counter - Alerts -->
-                            <span class="badge badge-danger badge-counter">3+</span>
                         </a>
-                        <!-- Dropdown - Alerts -->
-                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="alertsDropdown">
-                            <h6 class="dropdown-header">
-                                Alerts Center
-                            </h6>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-file-alt text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 12, 2019</div>
-                                    <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-donate text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 7, 2019</div>
-                                    $290.29 has been deposited into your account!
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-exclamation-triangle text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 2, 2019</div>
-                                    Spending Alert: We've noticed unusually high spending for your account.
-                                </div>
-                            </a>
-                            <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                        </div>
+                        
                     </li>
 
-                    <!-- Nav Item - Messages -->
-                    <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-envelope fa-fw"></i>
-                            <!-- Counter - Messages -->
-                            <span class="badge badge-danger badge-counter">7</span>
-                        </a>
-                        <!-- Dropdown - Messages -->
-                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="messagesDropdown">
-                            <h6 class="dropdown-header">
-                                Message Center
-                            </h6>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle" src="img/undraw_profile_1.svg"
-                                         alt="...">
-                                    <div class="status-indicator bg-success"></div>
-                                </div>
-                                <div class="font-weight-bold">
-                                    <div class="text-truncate">Hi there! I am wondering if you can help me with a
-                                        problem I've been having.</div>
-                                    <div class="small text-gray-500">Emily Fowler · 58m</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle" src="img/undraw_profile_2.svg"
-                                         alt="...">
-                                    <div class="status-indicator"></div>
-                                </div>
-                                <div>
-                                    <div class="text-truncate">I have the photos that you ordered last month, how
-                                        would you like them sent to you?</div>
-                                    <div class="small text-gray-500">Jae Chun · 1d</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle" src="img/undraw_profile_3.svg"
-                                         alt="...">
-                                    <div class="status-indicator bg-warning"></div>
-                                </div>
-                                <div>
-                                    <div class="text-truncate">Last month's report looks great, I am very happy with
-                                        the progress so far, keep up the good work!</div>
-                                    <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-                                         alt="...">
-                                    <div class="status-indicator bg-success"></div>
-                                </div>
-                                <div>
-                                    <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                                        told me that people say this to all dogs, even if they aren't good...</div>
-                                    <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-                        </div>
-                    </li>
 
                     <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -356,7 +237,7 @@ if (isset($_POST["submit"]) && isset($_POST["email"]) && !empty($_POST["email"])
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-2 text-gray-800">Manage Users</h1>
+                <h1 class="h3 mb-2 text-gray-800">Manage Profile</h1>
                 <!-- <?php if(isset($_SESSION["result"])): ?>
                     <div class=" z-5 alert alert-<?= $_SESSION["result"]["color"] ?> top-0 " role="alert">
                         <?= $_SESSION["result"]["message"] ?>
@@ -376,7 +257,7 @@ if (isset($_POST["submit"]) && isset($_POST["email"]) && !empty($_POST["email"])
                           
                         <div class="mb-4">
                             <div class="h-[200px] w-[200px] mb-3 mt-3 overflow-hidden border rounded-[10px]">
-                                <img style="object-fit:cover;width:100%;height:100%;" src="../../../public/img/covers/reference<?= $User["profile_picture_url"] ?>" alt="">
+                                <img style="object-fit:cover;width:100%;height:100%;" src="../../../public/img/profiles/reference<?= $User["profile_picture_url"] ?>" alt="">
                             </div>
                             <div class="input-group mb-3 h-[10px]">
                                 <div class="input-group-prepend">

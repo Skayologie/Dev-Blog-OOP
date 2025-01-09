@@ -8,10 +8,14 @@ session_start();
 if (isset($_POST["email"]) && isset($_POST["password"])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
+    // $hashedPassword = password_hash($password,PASSWORD_BCRYPT);
+    
     $row = User::login(["email"=>$email,"password"=>$password]);
     if($row){
         echo "Logged Successfully";
-        header("Location:./index.php");
+        header("Location:./login.php");
+    }else{
+        header("Location:./login.php");
     }
 }
 if (isset($_SESSION["Logged"])) {

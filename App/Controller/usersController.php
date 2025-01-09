@@ -20,8 +20,9 @@ class usersController
     }
     public static function addUser($username,$email,$pass,$bio,$pic){
         $conn = Database::getConnection();
+        $hashedPass = password_hash($pass,PASSWORD_BCRYPT);
         $resultAdd = CRUD::Add($conn,"users",["username","email","password_hash","bio","profile_picture_url"],
-                                          [$username,$email,$pass,$bio,$pic]);
+                                          [$username,$email,$hashedPass ,$bio,$pic]);
         if ($resultAdd) {
             return true;
         }

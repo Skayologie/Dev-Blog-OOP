@@ -32,12 +32,13 @@ class Stats{
     }
     public static function get_top_users(){
         $conn = Database::getConnection();
-        $sql = "SELECT 
+        $sql = "SELECT * ,
         users.id,profile_picture_url, username, 
         COUNT(articles.id) AS article_count, 
         SUM(articles.views) AS viewsAll 
         FROM articles 
         JOIN users ON users.id = articles.author_id 
+        WHERE users.isArchived = 0 AND users.isDeleted = 0
         GROUP BY users.id 
         ORDER BY viewsAll DESC 
         LIMIT 3";
