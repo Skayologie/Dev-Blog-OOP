@@ -5,6 +5,6 @@ vendor
 .flaskenv*
 !.env.project
 !.env.vault
-index.php
+
 .idea
 public/img/covers

@@ -33,12 +33,23 @@ class User{
         if ($result) {
             if ($stmt->rowCount() > 0) {
                 if(password_verify($password,$result["password_hash"])){
-                    $_SESSION["Logged"] = "Logged";
-                    $_SESSION["UserID"] = $result["id"];
-                    $_SESSION["UserName"] = $result["username"];
-                    $_SESSION["ProfilePic"] = $result["profile_picture_url"];
-                    $_SESSION["UserRole"] = $result["role"];
-                    return true;
+                    if ($result["isArchived"]) {
+                        $_SESSION["Banned"] = true;
+                        $_SESSION["Logged"] = "Logged";
+                        $_SESSION["UserID"] = $result["id"];
+                        $_SESSION["UserName"] = $result["username"];
+                        $_SESSION["ProfilePic"] = $result["profile_picture_url"];
+                        $_SESSION["UserRole"] = $result["role"];
+                        return true;
+                    }else{
+                        $_SESSION["Banned"] = false;
+                        $_SESSION["Logged"] = "Logged";
+                        $_SESSION["UserID"] = $result["id"];
+                        $_SESSION["UserName"] = $result["username"];
+                        $_SESSION["ProfilePic"] = $result["profile_picture_url"];
+                        $_SESSION["UserRole"] = $result["role"];
+                        return true;
+                    }
                 }
             }else{
                 return false;

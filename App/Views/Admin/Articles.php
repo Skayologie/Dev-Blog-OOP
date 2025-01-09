@@ -406,7 +406,6 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                             <td><?= $row['updated_at']?></td>
 
                                             <td class="flex ">
-                                                <a href="Articles.php?id=<?= $row['ArticleId']?>&op=edit"><button type="button" class="btn btn-info w-auto"><i class="fa-solid fa-pen-to-square"></i></button></a>
                                                 <a href="Articles.php?id=<?= $row['ArticleId']?>&op=archive"><button type="button" class="btn btn-warning w-auto "><i class="fa-solid fa-box-archive"></i></button></a>
                                             </td>
                                         </tr>
