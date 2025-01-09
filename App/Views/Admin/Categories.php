@@ -6,7 +6,8 @@ use App\Modules\CRUD;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole("admin","../index.php");
+Session::checkSessionRole(["admin"],"../index.php");
+
 
 $resCategories = categoriesController::GetCategories();
 if (isset($_GET["id"]) && isset($_GET["op"])){
@@ -430,7 +431,7 @@ if (isset($_POST["submit"]) && isset($_POST["CategorieName"])) {
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>

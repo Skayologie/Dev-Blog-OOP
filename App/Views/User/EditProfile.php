@@ -1,17 +1,48 @@
 <?php
 session_start();
-
+use App\Controller\articleController;
+use App\Controller\categoriesController;
 use App\Controller\operationsController;
+use App\Controller\tagsController;
 use App\Controller\usersController;
+use App\Modules\CRUD;
+use App\Modules\FileHandler;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
-Session::checkSessionRole(["admin"],"../index.php");
-
-
-$resArchived = usersController::GetArchivedUsers();
 Session::sessionCheck("Logged","../login.php");
+Session::checkSessionRole(["author"],"../index.php");
 
 
+$resUser = usersController::GetUsers();
+$resCategorie = categoriesController::GetCategories();
+$resTags = tagsController::GetTags();
+
+if (isset($_GET["id"])){
+    $resUserById = CRUD::GetById('users','id',$_GET["id"]);
+    $User = $resUserById[0];
+    print_r($User);  
+}else{
+    header("Location:../index.php");
+}
+
+if (isset($_POST["submit"]) && isset($_POST["email"]) && !empty($_POST["email"])){
+    if (isset($_FILES["coverImage"]) && $_FILES["coverImage"]["size"] != 0 ) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        $Cover = $_FILES["coverImage"];
+        $path = realpath(__DIR__."/../../../public/img/profiles/reference/");
+        $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"])["filename"];
+    }else{
+        $result = $_POST["coverfeatimage"];
+    }
+    $UserID = $_SESSION["UserID"];
+    $NewEmail = $_POST["email"];
+    $NewBio = $_POST["bio"];
+    $resultUpdate = usersController::updateUser($UserID,$NewEmail,$NewBio,$result);
+    if ($resultUpdate) {
+        header("Location:./EditProfile.php?id=".$UserID);
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,14 +60,15 @@ Session::sessionCheck("Logged","../login.php");
     <!-- Custom fonts for this template -->
     <link href="../../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="../../../public/css/sb-admin-2.min.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
     <link href="../../../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
@@ -63,7 +95,8 @@ Session::sessionCheck("Logged","../login.php");
         <li class="nav-item active">
             <a class="nav-link" href="../index.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
+                <span>Dashboard</span>
+            </a>
         </li>
 
         <!-- Divider -->
@@ -75,31 +108,21 @@ Session::sessionCheck("Logged","../login.php");
         </div>
 
         <!-- Nav Item - Pages Collapse Menu -->
+        <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-               aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-cog"></i>
+            <a class="nav-link collapsed" href="../index.php" >
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-link collapsed" href="../Author/myArticles.php" >
+                <i class="fa-solid fa-newspaper"></i>
+                <span>My Articles</span>
+            </a>
+            <a class="nav-link collapsed" href="./" >
                 <span>Management</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Users</h6>
-                    <a class="collapse-item" href="./TableUsers.php">Users</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Articles</h6>
-                    <a class="collapse-item" href="./Articles.php">Articles</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Tags</h6>
-                    <a class="collapse-item" href="../../../Pages/buttons.html">Tags</a>
-                </div>
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Manage Categories</h6>
-                    <a class="collapse-item" href="Categories.php">Categories</a>
-                </div>
-            </div>
         </li>
+        
 
 
 
@@ -130,7 +153,7 @@ Session::sessionCheck("Logged","../login.php");
 
                 <!-- Topbar Search -->
                 <form
-                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
                         <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
                                aria-label="Search" aria-describedby="basic-addon2">
@@ -289,37 +312,40 @@ Session::sessionCheck("Logged","../login.php");
                     <div class="topbar-divider d-none d-sm-block"></div>
 
                     <!-- Nav Item - User Information -->
-                    <li class="nav-item dropdown no-arrow">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?= $_SESSION["UserName"]; ?>
-                                </span>
-                                <img class="img-profile rounded-circle"
-                                    src="../../../public/img/profiles/reference<?= $_SESSION["ProfilePic"]; ?>">
-                            </a>
-                        <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Settings
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Activity Log
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Logout
-                            </a>
-                        </div>
-                    </li>
+                    <?php if(isset($_SESSION["UserName"])):?>
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                        <?= $_SESSION["UserName"]; ?>
+                                    </span>
+                                    <img class="img-profile rounded-circle"
+                                        src="../../../public/img/profiles/reference<?= $_SESSION["ProfilePic"]; ?>">
+                                </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item"href="./EditProfile.php?id=<?= $_SESSION["UserID"] ?>">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <!-- <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Settings
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Activity Log
+                                </a> -->
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="./logout.php" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+
+                            </div>
+                        </li>
+                    <?php endif;?>
 
                 </ul>
 
@@ -331,56 +357,57 @@ Session::sessionCheck("Logged","../login.php");
 
                 <!-- Page Heading -->
                 <h1 class="h3 mb-2 text-gray-800">Manage Users</h1>
-
+                <!-- <?php if(isset($_SESSION["result"])): ?>
+                    <div class=" z-5 alert alert-<?= $_SESSION["result"]["color"] ?> top-0 " role="alert">
+                        <?= $_SESSION["result"]["message"] ?>
+                    </div>
+                <?php endif; ?> -->
+                
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 justify-content-between d-flex">
                         <h6 class="m-0 align-content-center font-weight-bold text-primary">
-                            Users
+                            Edit Profile
                         </h6>
-                        <a href="TableUsers.php">
-                            <h6 class="m-0 bg-primary font-weight-bold text-light p-2 ">
-                                Normal Users
-                            </h6>
-                        </a>
+
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th>Operations</th>
-                                </tr>
-                                </thead>
-                                <tfoot>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Bio</th>
-                                    <th></th>
-                                </tr>
-                                </tfoot>
-                                <tbody>
-                                <?php foreach ($resArchived as $row):?>
-                                    <tr>
-                                        <td><?= $row['id']?></td>
-                                        <td><?= $row['username']?></td>
-                                        <td><?= $row['email']?></td>
-                                        <td><?= $row['bio']?></td>
-                                        <td>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=restore"><button type="button" class="btn btn-warning">Restore</button></a>
-                                            <a href="ArchivedUsers.php?id=<?= $row['id']?>&op=Delete"><button type="button" class="btn btn-danger">Delete</button></a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach;?>
-                                </tbody>
-                            </table>
+                    <div class="w-100 flex justify-center">
+                    <form method="post" class="w-50 d-flex flex-col"  enctype="multipart/form-data">
+                          
+                        <div class="mb-4">
+                            <div class="h-[200px] w-[200px] mb-3 mt-3 overflow-hidden border rounded-[10px]">
+                                <img style="object-fit:cover;width:100%;height:100%;" src="../../../public/img/covers/reference<?= $User["profile_picture_url"] ?>" alt="">
+                            </div>
+                            <div class="input-group mb-3 h-[10px]">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Upload Image</span>
+                                </div>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="coverImage" >
+                                    <input type="hidden"  name="coverfeatimage"  value="<?=$User["profile_picture_url"]?>" class="custom-file-input">
+                                    <label class="custom-file-label" for="inputGroupFile01">Choose Image</label>
+                                </div>
+                            </div>
+                        </div>    
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1"  class="form-label">Username</label>
+                            <input  disabled type="text" value="<?= $User["username"] ?>" class="form-control">
                         </div>
+                        <div class="mb-3">
+                            <label  class="form-label">Your Role</label>
+                            <input disabled  type="text" value="<?= $User["role"] ?>" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1"  class="form-label">Email</label>
+                            <input name="email" type="text" value="<?= $User["email"] ?>" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Bio</label>
+                            <textarea name="bio" class="form-control" aria-describedby="emailHelp"><?= $User["bio"] ?></textarea>
+                        </div>
+                        
+                        <button name="submit" type="submit" class="btn btn-primary">Update</button>
+                    </form>
                     </div>
                 </div>
 
@@ -447,6 +474,8 @@ Session::sessionCheck("Logged","../login.php");
 
 <!-- Page level custom scripts -->
 <script src="../../../public/js/demo/datatables-demo.js"></script>
+<script src="https://kit.fontawesome.com/285f192ded.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
 

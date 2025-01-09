@@ -46,5 +46,30 @@ class article
         $stmt->bindParam(':id', $idArticle, PDO::PARAM_STR);
         $stmt->execute();
     }
-}
 
+    public static function articleSearch($KeyWord){
+        $conn = Database::getConnection();
+        $query = "  SELECT *, articles.id AS ArticleId,
+                    articles.title AS title,
+                    users.username AS author_name,
+                    categories.name AS category_name,
+                    GROUP_CONCAT(tags.name) AS tags,
+                    articles.views, articles.created_at 
+                    FROM articles 
+                    LEFT JOIN users ON articles.author_id = users.id
+                    LEFT JOIN categories ON articles.category_id = categories.id
+                    LEFT JOIN article_tags ON articles.id = article_tags.article_id 
+                    LEFT JOIN tags ON article_tags.tag_id = tags.id 
+                    WHERE articles.status = 'published' 
+                    AND articles.isArchived = 0 
+                    AND title LIKE '%$KeyWord%' 
+                    GROUP BY articles.id, articles.title, users.username, categories.name, articles.views, articles.created_at 
+                    ORDER BY articles.created_at DESC;";
+        $stmt = $conn->prepare($query);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll();
+        } else {
+            return false;
+        }
+    }
+}

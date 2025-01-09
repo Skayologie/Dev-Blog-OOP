@@ -135,15 +135,27 @@ class CRUD
     }
 
     public static function Edit($id,$table,$data){
-        $conn = Database::getConnection();
-        $args = array();
-        
-        foreach ($data as $key => $value) {
-            $args[] = "$key = ?";
+        try {
+            $conn = Database::getConnection();
+            $args = array();
+            
+            foreach ($data as $key => $value) {
+                $args[] = "$key = ?";
+            }
+            $sql = "UPDATE $table SET " . implode(',', $args) . " WHERE id = $id";
+            $stmt = $conn->prepare($sql);
+            return $stmt->execute(array_values($data));
+        } catch (\Throwable $th) {
+            $errorID = $th->errorInfo[0];
+            if($errorID === "23000"){
+                $_SESSION["result"] = [
+                    "message"=>"Email Is Already Exist !",
+                    "color"=>"danger"
+                ];
+                return $_SESSION["result"];
+            }
         }
-        $sql = "UPDATE $table SET " . implode(',', $args) . " WHERE id = $id";
-        $stmt = $conn->prepare($sql);
-        return $stmt->execute(array_values($data));
+        
     }
 
     public static function GetLastID($table , $idCol){

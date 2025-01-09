@@ -20,8 +20,10 @@ class articleController{
             }
        }
     }
-    public static function UpdateArticle($id,$title,$content,$meta,$slug,$cover,$categorieID,$author_id,$tags)
+    // public static function UpdateArticle($id,$title,$content,$meta,$slug,$cover,$categorieID,$author_id,$tags)
+    public static function UpdateArticle($id,$title,$content,$slug,$meta,$categorieID,$author_id,$cover,$tags)
     {
+        $countTags = count($tags);
         $data = [
             "title"=>$title,
             "content"=> $content,
@@ -31,14 +33,21 @@ class articleController{
             "category_id"=> $categorieID,
             "author_id"=> $author_id,
         ];
-        if(CRUD::Edit(intval($id),'articles', $data)){
-                foreach ($tags as $value) {
-                    $resu = Tag::HardDeleteTag(intval($id),$value);
-                    if ($resu) {
-                        echo "Done";
-                    }
-                }
+        
+        $result = CRUD::Edit($id,"articles",$data);
+        $execTags = 0 ;
+        if($result){
+            foreach ($tags as $value) {
+                Tag::HardDeleteTag($id,intval($value));
+                Tag::addArticle_Tag($id,intval($value));
+                $execTags++;
+            }
+            if ($execTags === $countTags) {
+                header("Location:./myArticles.php");
+                exit;
+            }
         }
+        
     }
 
     public static function GetArticles()

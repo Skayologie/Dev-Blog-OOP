@@ -9,7 +9,8 @@ session_start();
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole("author","../index.php");
+Session::checkSessionRole(["author"],"../index.php");
+
 
 $resUser = usersController::GetUsers();
 $resCategorie = categoriesController::GetCategories();
@@ -443,7 +444,7 @@ if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="./logout.php">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
         </div>
     </div>

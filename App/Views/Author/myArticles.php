@@ -8,7 +8,8 @@ use App\Controller\usersController;
 use App\Modules\Session;
 session_start();
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole("author","../index.php");
+Session::checkSessionRole(["author"],"../index.php");
+
 
 $userID = $_SESSION["UserID"];
 $resArticles = authorController::GetOwnArticles($userID);
@@ -413,7 +414,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
                                     <img style="height: 100%; width:100%;object-fit:cover;" class="card-img-top " src="./../../../public/img/covers/reference<?=$ArticleRow["featured_image"]?>" alt="Card image cap">
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title"><?= $ArticleRow["title"] ?></h5>
+                                    <a href="../User/view-article.php?id=<?= $ArticleRow["ArticleId"] ?>"><h5 class="card-title"><?= $ArticleRow["title"] ?></h5></a>
                                     <p style='text-overflow: ellipsis;overflow: hidden; white-space: nowrap;' class="card-text"><?= $ArticleRow["content"] ?></p>
                                     <a href="./EditArticle.php?id=<?=$ArticleRow["ArticleId"]?>" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <a href="#" class="btn btn-danger"><i class="fa-solid fa-trash"></i></a>
@@ -466,7 +467,7 @@ if (isset($_GET["id"]) && isset($_GET["op"])){
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="./logout.php">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
         </div>
     </div>

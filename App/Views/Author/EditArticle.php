@@ -10,7 +10,8 @@ use App\Modules\FileHandler;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole("author","../index.php");
+Session::checkSessionRole(["author"],"../index.php");
+
 
 $resUser = usersController::GetUsers();
 $resCategorie = categoriesController::GetCategories();
@@ -19,34 +20,32 @@ $resTags = tagsController::GetTags();
 if (isset($_GET["id"])){
     $resArticleById = CRUD::GetById('Articles','id',$_GET["id"]);
     $Article = $resArticleById[0];
-    print_r($Article) ;
+    // print_r($Article);
     $ArticleCategorie = CRUD::GetById("categories","id",$Article['category_id'])[0];
     $tags = CRUD::GetById('article_tags','article_id',$_GET["id"]);
     $checkedTags = array_column($tags, 'tag_id');
 }
 
-if (isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"]) && isset($_POST["author"]) && isset($_POST["meta"]) ){
-    if (!isset($_FILES["coverImage"])) {
-        $Cover = $_POST["coverImage"];
-        $result = ["filename"=>$Cover];
-    }else{
+if (isset($_POST["submit"]) && isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categorie"])  && isset($_POST["meta"]) ){
+    if (isset($_FILES["coverImage"]) && $_FILES["coverImage"]["size"] != 0 ) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
         $Cover = $_FILES["coverImage"];
         $path = realpath(__DIR__."/../../../public/img/covers/reference/");
-        $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"]);
+        $result = FileHandler::handle_file_upload($Cover,$allowed_types,$path,$_POST["title"])["filename"];
+    }else{
+        $result = $_POST["coverfeatimage"];
     }
-        
+ 
     $categorieID = intval($_POST["categorie"]);
     $authorID = $_SESSION["UserID"];
     $tags = $_POST["tagsInput"];
+    $ArticleId = intval($_GET["id"]);
+    $NewTitle = $_POST["title"];
+    $NewContent = $_POST["content"];
+    $NewMeta = $_POST["meta"];
     $slug = articleController::create_slug($_POST["title"]);
-    articleController::UpdateArticle(intval($_POST["articleid"]),$_POST["title"],$_POST["content"],$_POST["meta"],$slug,$result["filename"],$categorieID,$authorID,$tags);
-
-}else{
-    print_r($_POST);
+    articleController::UpdateArticle($ArticleId,$NewTitle,$NewContent,$slug,$NewMeta,$categorieID,$authorID,$result,$tags);
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -379,7 +378,8 @@ if (isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categori
                                     <span class="input-group-text">Upload Cover</span>
                                 </div>
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" name="coverImage" id="inputGroupFile01">
+                                    <input type="file" class="custom-file-input" name="coverImage" >
+                                    <input type="hidden"  name="coverfeatimage"  value="<?=$Article["featured_image"]?>" class="custom-file-input">
                                     <label class="custom-file-label" for="inputGroupFile01">Choose Image</label>
                                 </div>
                             </div>
@@ -474,7 +474,7 @@ if (isset($_POST["title"]) && isset($_POST["content"]) && isset($_POST["categori
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="./logout.php">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
         </div>
     </div>

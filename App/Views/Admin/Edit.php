@@ -9,7 +9,8 @@ use App\Modules\CRUD;
 use App\Modules\Session;
 require __DIR__."/../../../vendor/autoload.php";
 Session::sessionCheck("Logged","../login.php");
-Session::checkSessionRole("admin","../index.php");
+Session::checkSessionRole(["admin"],"../index.php");
+
 $roles = Admin::getRoles();
 if (isset($_GET["id"])){
     $resUserById = CRUD::GetById('users','id',$_GET["id"]);
@@ -426,9 +427,9 @@ if(isset($_POST["username"]) || isset($_POST["email"]) || isset($_POST["bio"]) |
             </div>
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
-            </div>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
+                </div>
         </div>
     </div>
 </div>
