@@ -250,7 +250,7 @@ function nicetime($date)
                                     <?=$ArticleRow["views"]?>
                                 </div>
                                 <div style="width:100%;height:200px;">
-                                    <img style="height: 100%; width:100%;object-fit:cover;" class="card-img-top " src="./../../../public/img/covers/referenceCover.jpg" alt="Card image cap">
+                                    <img style="height: 100%; width:100%;object-fit:cover;" class="card-img-top " src="./../../../public/img/covers/reference<?=$ArticleRow["featured_image"]?>" alt="Card image cap">
                                     <!-- <img style="height: 100%; width:100%;object-fit:cover;" class="card-img-top " src="./../../../public/img/covers/reference<?=$ArticleRow["featured_image"]?>" alt="Card image cap"> -->
                                 </div>
                                 <div class="card-body">
